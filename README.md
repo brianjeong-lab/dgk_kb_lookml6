@@ -15,7 +15,7 @@ GCP DataFlow 처리를 위한 소스
 3. 기타 활성화/비활성화
 <PRE>
   $ source env/bin/activate
-  $ source deactivate
+  $ deactivate
 </PRE>
 
 ## 참고문서
