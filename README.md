@@ -7,10 +7,15 @@ GCP DataFlow 처리를 위한 소스
   $ virtualenv data-sci-env -p python3
   $ source data-sci-env/bin/activate
 </PRE>
-2. 설치
+2. 관련 pip 설치
 <PRE>
   $ pip install timezonefinder pytz
   $ pip install apache-beam[gcp]
+</PRE>
+3. 기타 활성화/비활성화
+<PRE>
+  $ source env/bin/activate
+  $ source deactivate
 </PRE>
 
 ## 참고문서
