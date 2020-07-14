@@ -13,4 +13,6 @@ GCP DataFlow 처리를 위한 소스
   $ pip install apache-beam[gcp]
 </PRE>
 
-## 샘플코드 : https://github.com/GoogleCloudPlatform/data-science-on-gcp/
+## 참고문서
+1. source : https://github.com/GoogleCloudPlatform/data-science-on-gcp/
+2. apache-beam 설명 : https://github.com/sungjunyoung/apache_beam_doc_ko
