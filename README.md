@@ -4,8 +4,9 @@ GCP DataFlow 처리를 위한 소스
 ## 테스트 방법
 1. 가상환경
 <PRE>
-  $ virtualenv data-sci-env -p python3
-  $ source data-sci-env/bin/activate
+  $ cd ~
+  $ virtualenv daas-env -p python3
+  $ source daas-env/bin/activate
 </PRE>
 2. 관련 pip 설치
 <PRE>
@@ -14,7 +15,8 @@ GCP DataFlow 처리를 위한 소스
 </PRE>
 3. 기타 활성화/비활성화
 <PRE>
-  $ source env/bin/activate
+  $ cs ~
+  $ source daas-env/bin/activate
   $ deactivate
 </PRE>
 
