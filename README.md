@@ -23,3 +23,7 @@ GCP DataFlow 처리를 위한 소스 ()
 ## 참고문서
 1. source : https://github.com/GoogleCloudPlatform/data-science-on-gcp/
 2. apache-beam 설명 : https://github.com/sungjunyoung/apache_beam_doc_ko
+
+## 구글독스 정리 
+1. GCS에서 빅쿼리로 csv적재 : https://docs.google.com/document/d/1RXJESagdBChFIA6W863GIUYbH6Qnn_UYzq6I_Uk-eIk/edit?usp=sharing
+2. 빅쿼리 select > ai > insert : https://docs.google.com/document/d/1QepjUftoFVncGRlAv_KHJgmOHN0DRezLp-J5tFDpA0A/edit?usp=sharing
