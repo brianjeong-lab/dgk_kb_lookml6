@@ -23,6 +23,10 @@ GCP DataFlow 처리를 위한 소스 ()
 ## 참고문서
 1. source : https://github.com/GoogleCloudPlatform/data-science-on-gcp/
 2. apache-beam 설명 : https://github.com/sungjunyoung/apache_beam_doc_ko
+3. Data Flow Prediction 예제 : https://github.com/GoogleCloudPlatform/dataflow-prediction-example
+4. Data Flow Template (Java) : https://github.com/GoogleCloudPlatform/DataflowTemplates.git
+5. Data Flow Example (Python) : https://github.com/GoogleCloudPlatform/professional-services/tree/master/examples/dataflow-python-examples
+
 
 ## 구글독스 정리 
 1. GCS에서 빅쿼리로 csv적재 : https://docs.google.com/document/d/1RXJESagdBChFIA6W863GIUYbH6Qnn_UYzq6I_Uk-eIk/edit?usp=sharing
