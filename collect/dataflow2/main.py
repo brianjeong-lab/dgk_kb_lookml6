@@ -43,7 +43,7 @@ def cleansing(line):
         return line
 
 def csv_reader(line):
-    csv.field_size_limit(1000000)
+    csv.field_size_limit(sys.maxsize)
     return csv.reader([cleansing(line)])
 
 def csv_reader2(line):
@@ -98,7 +98,7 @@ def main(pipeline_args, app_args):
 
     bankdatas = (pipeline
         #| 'Load Data' >> beam.io.ReadFromText(f'{path}/{month}/{day}/{hour}.csv.gz')
-        | 'Load Data' >> beam.io.ReadFromText('gs://my_test_bk_0630/bank_data_0630/KBSTAR1_0616_0630_02.csv.gz')
+        | 'Load Data' >> beam.io.ReadFromText('gs://my_test_bk_0630/bank_data_0630/KBSTAR1_0616_0630_03.csv.gz')
         | 'CSV Parser' >> beam.Map(lambda line: next(csv_reader(line)))
     )
 
