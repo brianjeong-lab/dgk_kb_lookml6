@@ -59,3 +59,19 @@ WHERE
 ```
 
 # 중복데이타 삭제
+```
+DELETE FROM `kb-daas-dev.master.keyword_bank_result` A
+WHERE
+  DATE(A.CRAWLSTAMP) > "2020-05-20"
+  AND CONCAT(CAST(A.ID as string), '_', CAST(A.RESPONSE.proc_time as string)) IN (
+    SELECT 
+       CONCAT(CAST(BB.ID as string), '_', CAST(BB.proc_time as string))
+     FROM (
+        select ID, MIN(RESPONSE.proc_time) as proc_time, count(*) as cnt 
+        from `kb-daas-dev.master.keyword_bank_result` 
+        where DATE(CRAWLSTAMP) > "2020-05-20" and RESPONSE.status_code = 200 
+        GROUP BY ID
+      ) BB
+     WHERE cnt > 1
+  ) 
+```
