@@ -32,7 +32,9 @@ def call_kbsta_api(content):
     # AWS
     #url = "http://3.34.18.1:8080/analyze"
     # GCP
-    url = "http://34.64.172.194:28080/analyze"
+    #url = "http://34.64.172.194:28080/analyze"
+    # LB
+    url = "http://35.241.3.78:8080/analyze"
     querystring = {"tasks":"d2c,kpe,kse"}
     body = "text=" + content
     body = body.encode(encoding='utf-8')

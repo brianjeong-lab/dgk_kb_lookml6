@@ -13,7 +13,7 @@ python3 main.py \
     --runner DataflowRunner \
     --region "asia-northeast1" \
     --temp_location "gs://kb-daas-dev-raw-data/rsn/temp/" \
-    --max_num_workers 1 \
-    --number_of_worker_harness_threads 10 \
+    --max_num_workers 4 \
+    --number_of_worker_harness_threads 50 \
     --use_public_ips false 
 
