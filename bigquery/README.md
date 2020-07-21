@@ -75,3 +75,23 @@ WHERE
      WHERE cnt > 1
   ) 
 ```
+
+# 원본 데이터와 KB-STA 데이터 같이 보기
+SELECT a.id
+     , b.origin_id
+     , a.ss
+     , d_content
+     , a.d2c
+  FROM `kb-daas-dev.master.keyword_bank_result` A
+     , (select id as origin_id 
+             , d_content
+          from `kb-daas-dev.master.keyword_bank`
+         where DATE(d_CRAWLSTAMP) > "2020-05-20" ) b
+ WHERE DATE(A.CRAWLSTAMP) > "2020-05-20" 
+   and a.id = b.origin_id
+
+# UNNEST를 이용하여 키워드로 filltering 하기
+select * FROM `kb-daas-dev.master.keyword_bank_result` a
+cross join unnest(d2c) b
+where  DATE(CRAWLSTAMP) > "2020-05-20"
+and b.label = '여행'
