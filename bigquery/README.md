@@ -75,3 +75,19 @@ WHERE
      WHERE cnt > 1
   ) 
 ```
+
+# 원본 데이터와 KB-STA 데이터 같이 보기
+SELECT a.id
+     , b.origin_id
+     , a.ss
+     , d_content
+     , a.d2c
+ --    , d2c
+  FROM `kb-daas-dev.master.keyword_bank_result` A
+     , (select id as origin_id 
+             , d_content
+          from `kb-daas-dev.master.keyword_bank`
+         where DATE(d_CRAWLSTAMP) > "2020-05-20" ) b
+--     cross join unnest(d2c) as d2c
+ WHERE DATE(A.CRAWLSTAMP) > "2020-05-20" 
+   and a.id = b.origin_id
