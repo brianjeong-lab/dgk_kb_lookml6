@@ -1,4 +1,6 @@
+import argparse
 import apache_beam as beam
+from apache_beam.options.pipeline_options import SetupOptions
 from apache_beam.options.pipeline_options import PipelineOptions, StandardOptions
 from apache_beam.io.gcp.internal.clients.bigquery import bigquery_v2_messages
 import requests
@@ -149,7 +151,7 @@ def main(pipeline_options, app_args):
     logging.info(f'table : {table}')
 
     raw_data = (pipeline
-        | 'Read Data From BigQuery' >> beam.io.Read(
+        | '1.Read Data From BigQuery' >> beam.io.Read(
             beam.io.BigQuerySource(
                 query=f"""
                     SELECT 
@@ -157,26 +159,25 @@ def main(pipeline_options, app_args):
                         , D_CRAWLSTAMP
                         , D_CONTENT 
                     FROM 
-                        `{dateset}.{table}` 
+                        `{dataset}.{table}` 
                     WHERE 
-                        D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul') AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul'), INTERVAL 1 HOUR) 
-                    -- LIMIT 
+                        D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul') AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul'), INTERVAL 1 DAY) 
                 """,
-                project=project_id,
+                project=project,
                 use_standard_sql=True)
         )
     )
 
     processing_data = (raw_data
-        | 'Cleansing' >> beam.Map(lambda row: {'ID':row['ID'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_CONTENT':cleasing_contents(row['D_CONTENT'])})
-        | 'Call with KB STA API' >> beam.Map(lambda row: {'ID':row['ID'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_RESULT':call_kbsta_api_with_json(row['D_CONTENT'])})
-        | 'Trasfrom Result' >> beam.Map(lambda row: convert_kbsta_formatted_map(row))
+        | '2.Cleansing' >> beam.Map(lambda row: {'ID':row['ID'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_CONTENT':cleasing_contents(row['D_CONTENT'])})
+        | '3.Call with KB STA API' >> beam.Map(lambda row: {'ID':row['ID'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_RESULT':call_kbsta_api_with_json(row['D_CONTENT'])})
+        | '4.Trasfrom Result' >> beam.Map(lambda row: convert_kbsta_formatted_map(row))
     )
 
     (
         processing_data
-        | 'Loading to Bigquery' >> beam.io.WriteToBigQuery(
-            table=table,
+        | '5.Loading to Bigquery' >> beam.io.WriteToBigQuery(
+            table=f'{table}_result',
             dataset=dataset,
             project=project,
             #schema=schema,

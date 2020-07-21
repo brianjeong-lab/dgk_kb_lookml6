@@ -153,7 +153,7 @@ def main1():
                     FROM 
                         `kb-daas-dev.master.keyword_bank` 
                     WHERE 
-                        D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') AND TIMESTAMP('2020-06-01 01:00:00', 'Asia/Seoul') 
+                        D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 02:00:00', 'Asia/Seoul') AND TIMESTAMP('2020-06-01 12:00:00', 'Asia/Seoul') 
                     -- LIMIT 
                 """,
                 project=project_id,
