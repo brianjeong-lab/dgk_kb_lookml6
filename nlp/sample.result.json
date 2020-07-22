@@ -1,0 +1,1219 @@
+entities {
+  name: "KB\352\270\210\354\234\265\352\267\270\353\243\271 \354\227\260\352\270\210"
+  type: ORGANIZATION
+  salience: 0.021244892850518227
+  mentions {
+    text {
+      content: "KB\352\270\210\354\234\265\352\267\270\353\243\271 \354\227\260\352\270\210"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "CU\355\216\270\354\235\230\354\240\220 \353\252\250\353\260\224\354\235\274\354\203\201\355\222\210\352\266\214"
+  type: CONSUMER_GOOD
+  salience: 0.020277073606848717
+  mentions {
+    text {
+      content: "CU\355\216\270\354\235\230\354\240\220 \353\252\250\353\260\224\354\235\274\354\203\201\355\222\210\352\266\214"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "\354\235\264\353\262\244\355\212\270"
+  type: EVENT
+  salience: 0.01954544708132744
+  mentions {
+    text {
+      content: "\354\235\264\353\262\244\355\212\270"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\213\244\354\235\264\354\212\250"
+  type: PERSON
+  metadata {
+    key: "mid"
+    value: "/g/1hhcj17z5"
+  }
+  salience: 0.017037881538271904
+  mentions {
+    text {
+      content: "\353\213\244\354\235\264\354\212\250"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "\352\267\270\353\236\250"
+  type: CONSUMER_GOOD
+  salience: 0.017037881538271904
+  mentions {
+    text {
+      content: "\352\267\270\353\236\250"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "\354\202\274\354\204\261 \352\267\270\353\236\200\353\215\260"
+  type: ORGANIZATION
+  salience: 0.017037881538271904
+  mentions {
+    text {
+      content: "\354\202\274\354\204\261 \352\267\270\353\236\200\353\215\260"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "KB\352\265\255\353\257\274\354\235\200\355\226\211"
+  type: ORGANIZATION
+  metadata {
+    key: "mid"
+    value: "/m/0425m0"
+  }
+  metadata {
+    key: "wikipedia_url"
+    value: "https://en.wikipedia.org/wiki/KB_Financial_Group_Inc"
+  }
+  salience: 0.01579354703426361
+  mentions {
+    text {
+      content: "KB\352\265\255\353\257\274\354\235\200\355\226\211"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+  mentions {
+    text {
+      content: "\352\265\255\353\257\274\354\235\200\355\226\211"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "LG"
+  type: ORGANIZATION
+  metadata {
+    key: "mid"
+    value: "/m/04k024"
+  }
+  metadata {
+    key: "wikipedia_url"
+    value: "https://en.wikipedia.org/wiki/LG_Corporation"
+  }
+  salience: 0.015461799688637257
+  mentions {
+    text {
+      content: "LG"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "\352\263\240\352\260\235"
+  type: PERSON
+  salience: 0.015400975942611694
+  mentions {
+    text {
+      content: "\352\263\240\352\260\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\355\225\264\355\224\274(All happy"
+  type: OTHER
+  salience: 0.015327583067119122
+  mentions {
+    text {
+      content: "\355\225\264\355\224\274(All happy"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "\354\235\264\353\262\244\355\212\270"
+  type: EVENT
+  salience: 0.01452605426311493
+  mentions {
+    text {
+      content: "\354\235\264\353\262\244\355\212\270"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\235\264\353\262\244\355\212\270"
+  type: EVENT
+  salience: 0.01452605426311493
+  mentions {
+    text {
+      content: "\354\235\264\353\262\244\355\212\270"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\235\264\353\262\244\355\212\270"
+  type: EVENT
+  salience: 0.013797815889120102
+  mentions {
+    text {
+      content: "\354\235\264\353\262\244\355\212\270"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\235\264\353\262\244\355\212\270"
+  type: EVENT
+  salience: 0.0135270981118083
+  mentions {
+    text {
+      content: "\354\235\264\353\262\244\355\212\270"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\240\352\260\235"
+  type: PERSON
+  salience: 0.013502268120646477
+  mentions {
+    text {
+      content: "\352\263\240\352\260\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "LG \354\275\224\353\223\234\354\240\234\353\241\234"
+  type: ORGANIZATION
+  salience: 0.013436170294880867
+  mentions {
+    text {
+      content: "LG \354\275\224\353\223\234\354\240\234\353\241\234"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "\354\235\264\353\262\244\355\212\270"
+  type: EVENT
+  salience: 0.013416018337011337
+  mentions {
+    text {
+      content: "\354\235\264\353\262\244\355\212\270"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\240\352\260\235"
+  type: PERSON
+  salience: 0.013383413664996624
+  mentions {
+    text {
+      content: "\352\263\240\352\260\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\235\264\353\262\244\355\212\270"
+  type: EVENT
+  salience: 0.01329778041690588
+  mentions {
+    text {
+      content: "\354\235\264\353\262\244\355\212\270"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\227\260\352\270\210"
+  type: OTHER
+  salience: 0.013164418749511242
+  mentions {
+    text {
+      content: "\354\227\260\352\270\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\355\207\264\354\247\201\354\227\260\352\270\210"
+  type: OTHER
+  salience: 0.013164418749511242
+  mentions {
+    text {
+      content: "\355\207\264\354\247\201\354\227\260\352\270\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\240\200\354\266\225\355\216\200\353\223\234"
+  type: OTHER
+  salience: 0.013164418749511242
+  mentions {
+    text {
+      content: "\354\240\200\354\266\225\355\216\200\353\223\234"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\252\250\353\260\224\354\235\274 \354\203\201\355\222\210\352\266\214"
+  type: OTHER
+  salience: 0.013164418749511242
+  mentions {
+    text {
+      content: "\353\252\250\353\260\224\354\235\274 \354\203\201\355\222\210\352\266\214"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\240\352\260\235"
+  type: PERSON
+  salience: 0.013119323179125786
+  mentions {
+    text {
+      content: "\352\263\240\352\260\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\240\352\260\235"
+  type: PERSON
+  salience: 0.013091649860143661
+  mentions {
+    text {
+      content: "\352\263\240\352\260\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\240\352\260\235"
+  type: PERSON
+  salience: 0.013091649860143661
+  mentions {
+    text {
+      content: "\352\263\240\352\260\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\240\352\260\235"
+  type: PERSON
+  salience: 0.012417560443282127
+  mentions {
+    text {
+      content: "\352\263\240\352\260\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\246\254\353\260\270\353\237\260\354\213\261"
+  type: OTHER
+  salience: 0.01235585194081068
+  mentions {
+    text {
+      content: "\353\246\254\353\260\270\353\237\260\354\213\261"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "\352\263\240\352\260\235"
+  type: PERSON
+  salience: 0.012332904152572155
+  mentions {
+    text {
+      content: "\352\263\240\352\260\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\240\352\260\235"
+  type: PERSON
+  salience: 0.012332904152572155
+  mentions {
+    text {
+      content: "\352\263\240\352\260\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\235\264\353\262\244\355\212\270"
+  type: EVENT
+  salience: 0.01229704450815916
+  mentions {
+    text {
+      content: "\354\235\264\353\262\244\355\212\270"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "KB\352\270\210\354\234\265\354\247\200\354\243\274"
+  type: ORGANIZATION
+  metadata {
+    key: "mid"
+    value: "/m/0x1w1tm"
+  }
+  metadata {
+    key: "wikipedia_url"
+    value: "https://fi.wikipedia.org/wiki/KB_Financial_Group"
+  }
+  salience: 0.012271544896066189
+  mentions {
+    text {
+      content: "KB\352\270\210\354\234\265\354\247\200\354\243\274"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "\354\234\244\354\242\205\352\267\234"
+  type: PERSON
+  metadata {
+    key: "mid"
+    value: "/g/1dv16150"
+  }
+  salience: 0.012271544896066189
+  mentions {
+    text {
+      content: "\354\234\244\354\242\205\352\267\234"
+      begin_offset: -1
+    }
+    type: PROPER
+  }
+}
+entities {
+  name: "\352\263\240\352\260\235"
+  type: PERSON
+  salience: 0.011920144781470299
+  mentions {
+    text {
+      content: "\352\263\240\352\260\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\260\234\354\235\270\355\230\225IRP"
+  type: OTHER
+  salience: 0.011677215807139874
+  mentions {
+    text {
+      content: "\352\260\234\354\235\270\355\230\225IRP"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\203\201\355\222\210"
+  type: CONSUMER_GOOD
+  salience: 0.011391724459826946
+  mentions {
+    text {
+      content: "\354\203\201\355\222\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\266\224\354\262\234 \355\216\200\353\223\234"
+  type: OTHER
+  salience: 0.011391724459826946
+  mentions {
+    text {
+      content: "\354\266\224\354\262\234 \355\216\200\353\223\234"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\355\216\200\353\223\234 \354\203\201\355\222\210"
+  type: OTHER
+  salience: 0.011160789988934994
+  mentions {
+    text {
+      content: "\355\216\200\353\223\234 \354\203\201\355\222\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\252\250\353\260\224\354\235\274\354\203\201\355\222\210\352\266\214"
+  type: OTHER
+  salience: 0.011160789988934994
+  mentions {
+    text {
+      content: "\353\252\250\353\260\224\354\235\274\354\203\201\355\222\210\352\266\214"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\240\200\354\266\225\355\216\200\353\223\234"
+  type: OTHER
+  salience: 0.011160789988934994
+  mentions {
+    text {
+      content: "\354\240\200\354\266\225\355\216\200\353\223\234"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\227\260\352\270\210"
+  type: OTHER
+  salience: 0.011160789988934994
+  mentions {
+    text {
+      content: "\354\227\260\352\270\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\227\260\352\270\210"
+  type: OTHER
+  salience: 0.011136605404317379
+  mentions {
+    text {
+      content: "\354\227\260\352\270\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\240\200\354\266\225\355\216\200\353\223\234"
+  type: OTHER
+  salience: 0.011136605404317379
+  mentions {
+    text {
+      content: "\354\240\200\354\266\225\355\216\200\353\223\234"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\203\201\355\222\210"
+  type: CONSUMER_GOOD
+  salience: 0.011029619723558426
+  mentions {
+    text {
+      content: "\354\203\201\355\222\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\227\260\352\270\210"
+  type: OTHER
+  salience: 0.010965410619974136
+  mentions {
+    text {
+      content: "\354\227\260\352\270\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\240\200\354\266\225\355\216\200\353\223\234"
+  type: OTHER
+  salience: 0.010965410619974136
+  mentions {
+    text {
+      content: "\354\240\200\354\266\225\355\216\200\353\223\234"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\262\275\355\222\210"
+  type: OTHER
+  salience: 0.010770712979137897
+  mentions {
+    text {
+      content: "\352\262\275\355\222\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\260\200\354\236\205"
+  type: OTHER
+  salience: 0.010770712979137897
+  mentions {
+    text {
+      content: "\352\260\200\354\236\205"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\260\234\354\235\270\355\230\225IRP"
+  type: OTHER
+  salience: 0.010637877508997917
+  mentions {
+    text {
+      content: "\352\260\234\354\235\270\355\230\225IRP"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\260\270\354\227\254"
+  type: OTHER
+  salience: 0.010076596401631832
+  mentions {
+    text {
+      content: "\354\260\270\354\227\254"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\260\234\354\235\270\355\230\225IRP"
+  type: OTHER
+  salience: 0.009964915923774242
+  mentions {
+    text {
+      content: "\352\260\234\354\235\270\355\230\225IRP"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\260\270\354\227\254"
+  type: OTHER
+  salience: 0.009868736378848553
+  mentions {
+    text {
+      content: "\354\260\270\354\227\254"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\260\270\354\227\254"
+  type: OTHER
+  salience: 0.009846976958215237
+  mentions {
+    text {
+      content: "\354\260\270\354\227\254"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\235\200\355\226\211"
+  type: ORGANIZATION
+  salience: 0.009801236912608147
+  mentions {
+    text {
+      content: "\354\235\200\355\226\211"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\260\234\354\235\270\355\230\225IRP"
+  type: OTHER
+  salience: 0.009692996740341187
+  mentions {
+    text {
+      content: "\352\260\234\354\235\270\355\230\225IRP"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\262\275\355\222\210"
+  type: OTHER
+  salience: 0.009365757927298546
+  mentions {
+    text {
+      content: "\352\262\275\355\222\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\236\220\354\202\260"
+  type: OTHER
+  salience: 0.009278573095798492
+  mentions {
+    text {
+      content: "\354\236\220\354\202\260"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\236\220\354\202\260"
+  type: OTHER
+  salience: 0.009085171855986118
+  mentions {
+    text {
+      content: "\354\236\220\354\202\260"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\213\240\352\267\234"
+  type: OTHER
+  salience: 0.009064930491149426
+  mentions {
+    text {
+      content: "\354\213\240\352\267\234"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\262\275\355\222\210"
+  type: OTHER
+  salience: 0.009064930491149426
+  mentions {
+    text {
+      content: "\352\262\275\355\222\210"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\213\240\352\267\234"
+  type: OTHER
+  salience: 0.008921723812818527
+  mentions {
+    text {
+      content: "\354\213\240\352\267\234"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\213\240\352\267\234\352\260\200\354\236\205"
+  type: OTHER
+  salience: 0.008573372848331928
+  mentions {
+    text {
+      content: "\354\213\240\352\267\234\352\260\200\354\236\205"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\236\220\354\202\260"
+  type: OTHER
+  salience: 0.008511840365827084
+  mentions {
+    text {
+      content: "\354\236\220\354\202\260"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\265\352\270\260\354\262\255\354\240\225\352\270\260"
+  type: OTHER
+  salience: 0.00841122679412365
+  mentions {
+    text {
+      content: "\352\263\265\352\270\260\354\262\255\354\240\225\352\270\260"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\241\234\353\264\207\354\262\255\354\206\214\352\270\260"
+  type: CONSUMER_GOOD
+  salience: 0.00841122679412365
+  mentions {
+    text {
+      content: "\353\241\234\353\264\207\354\262\255\354\206\214\352\270\260"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\214\200\354\203\201"
+  type: PERSON
+  salience: 0.00841122679412365
+  mentions {
+    text {
+      content: "\353\214\200\354\203\201"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\205\270\355\212\270\353\266\201"
+  type: CONSUMER_GOOD
+  salience: 0.00841122679412365
+  mentions {
+    text {
+      content: "\353\205\270\355\212\270\353\266\201"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\204\354\242\214"
+  type: OTHER
+  salience: 0.008331946097314358
+  mentions {
+    text {
+      content: "\352\263\204\354\242\214"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\232\264\354\232\251\354\202\254"
+  type: OTHER
+  salience: 0.008331946097314358
+  mentions {
+    text {
+      content: "\354\232\264\354\232\251\354\202\254"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\232\264\354\232\251\354\202\254"
+  type: OTHER
+  salience: 0.008156144060194492
+  mentions {
+    text {
+      content: "\354\232\264\354\232\251\354\202\254"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\263\264\354\234\240"
+  type: OTHER
+  salience: 0.008156144060194492
+  mentions {
+    text {
+      content: "\353\263\264\354\234\240"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\263\264\354\234\240"
+  type: OTHER
+  salience: 0.008137750439345837
+  mentions {
+    text {
+      content: "\353\263\264\354\234\240"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\204\354\242\214"
+  type: OTHER
+  salience: 0.007691360544413328
+  mentions {
+    text {
+      content: "\352\263\204\354\242\214"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\214\200\354\203\201"
+  type: PERSON
+  salience: 0.007691360544413328
+  mentions {
+    text {
+      content: "\353\214\200\354\203\201"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\202\254\354\227\205\353\266\200\353\254\270"
+  type: OTHER
+  salience: 0.0075585548765957355
+  mentions {
+    text {
+      content: "\354\202\254\354\227\205\353\266\200\353\254\270"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\246\235\352\266\214"
+  type: ORGANIZATION
+  salience: 0.0075585548765957355
+  mentions {
+    text {
+      content: "\354\246\235\352\266\214"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\263\265\353\217\231"
+  type: OTHER
+  salience: 0.0075585548765957355
+  mentions {
+    text {
+      content: "\352\263\265\353\217\231"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\353\205\270\355\233\204"
+  type: OTHER
+  salience: 0.007363990880548954
+  mentions {
+    text {
+      content: "\353\205\270\355\233\204"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\204\240\355\222\215\352\270\260"
+  type: CONSUMER_GOOD
+  salience: 0.007213130593299866
+  mentions {
+    text {
+      content: "\354\204\240\355\222\215\352\270\260"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\261\264\354\241\260\352\270\260"
+  type: OTHER
+  salience: 0.007213130593299866
+  mentions {
+    text {
+      content: "\352\261\264\354\241\260\352\270\260"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\204\270\355\203\201\352\270\260"
+  type: CONSUMER_GOOD
+  salience: 0.007213130593299866
+  mentions {
+    text {
+      content: "\354\204\270\355\203\201\352\270\260"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\262\275\354\232\260"
+  type: OTHER
+  salience: 0.006991054397076368
+  mentions {
+    text {
+      content: "\352\262\275\354\232\260"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\240\204\354\233\220"
+  type: PERSON
+  salience: 0.006975048687309027
+  mentions {
+    text {
+      content: "\354\240\204\354\233\220"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\355\226\211\353\263\265"
+  type: OTHER
+  salience: 0.006538455840200186
+  mentions {
+    text {
+      content: "\355\226\211\353\263\265"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\355\232\214\354\236\245"
+  type: PERSON
+  salience: 0.006538455840200186
+  mentions {
+    text {
+      content: "\355\232\214\354\236\245"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\355\231\225\353\214\200"
+  type: OTHER
+  salience: 0.006538455840200186
+  mentions {
+    text {
+      content: "\355\231\225\353\214\200"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\352\264\200\352\263\204\354\236\220"
+  type: PERSON
+  salience: 0.006302747875452042
+  mentions {
+    text {
+      content: "\352\264\200\352\263\204\354\236\220"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\204\270\354\240\234"
+  type: OTHER
+  salience: 0.006302747875452042
+  mentions {
+    text {
+      content: "\354\204\270\354\240\234"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\355\230\234\355\203\235"
+  type: OTHER
+  salience: 0.006302747875452042
+  mentions {
+    text {
+      content: "\355\230\234\355\203\235"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "\354\244\200\353\271\204"
+  type: OTHER
+  salience: 0.005188258830457926
+  mentions {
+    text {
+      content: "\354\244\200\353\271\204"
+      begin_offset: -1
+    }
+    type: COMMON
+  }
+}
+entities {
+  name: "9"
+  type: NUMBER
+  metadata {
+    key: "value"
+    value: "9"
+  }
+  mentions {
+    text {
+      content: "9"
+      begin_offset: -1
+    }
+  }
+}
+entities {
+  name: "21"
+  type: NUMBER
+  metadata {
+    key: "value"
+    value: "21"
+  }
+  mentions {
+    text {
+      content: "21"
+      begin_offset: -1
+    }
+  }
+}
+entities {
+  name: "2"
+  type: NUMBER
+  metadata {
+    key: "value"
+    value: "2"
+  }
+  mentions {
+    text {
+      content: "2"
+      begin_offset: -1
+    }
+  }
+}
+entities {
+  name: "1"
+  type: NUMBER
+  metadata {
+    key: "value"
+    value: "1"
+  }
+  mentions {
+    text {
+      content: "1"
+      begin_offset: -1
+    }
+  }
+}
+entities {
+  name: "93"
+  type: NUMBER
+  metadata {
+    key: "value"
+    value: "93"
+  }
+  mentions {
+    text {
+      content: "93"
+      begin_offset: -1
+    }
+  }
+}
+entities {
+  name: "31"
+  type: NUMBER
+  metadata {
+    key: "value"
+    value: "31"
+  }
+  mentions {
+    text {
+      content: "31"
+      begin_offset: -1
+    }
+  }
+}
+entities {
+  name: "\354\240\234\353\241\234"
+  type: NUMBER
+  metadata {
+    key: "value"
+    value: "0"
+  }
+  mentions {
+    text {
+      content: "\354\240\234\353\241\234"
+      begin_offset: -1
+    }
+  }
+}
+language: "ko"
+

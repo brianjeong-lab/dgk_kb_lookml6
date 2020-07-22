@@ -32,9 +32,10 @@ def call_kbsta_api(content):
     # AWS
     #url = "http://3.34.18.1:8080/analyze"
     # GCP
-    #url = "http://34.64.172.194:28080/analyze"
+    url = "http://34.64.172.194:28080/analyze" 
+    #url = "http://34.64.187.246:28080/analyze" # -1
     # LB
-    url = "http://35.241.3.78:8080/analyze"
+    #url = "http://35.241.3.78:8080/analyze"
     querystring = {"tasks":"d2c,kpe,kse"}
     body = "text=" + content
     body = body.encode(encoding='utf-8')
@@ -163,7 +164,8 @@ def main(pipeline_options, app_args):
                     FROM 
                         `{dataset}.{table}` 
                     WHERE 
-                        D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul') AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul'), INTERVAL 1 DAY) 
+                        D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul') 
+                        AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul'), INTERVAL 1 DAY) 
                 """,
                 project=project,
                 use_standard_sql=True)
