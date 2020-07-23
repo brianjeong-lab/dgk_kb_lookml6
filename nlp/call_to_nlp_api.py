@@ -196,49 +196,23 @@ def main1():
                             FROM 
                                 `kb-daas-dev.master_200722.keyword_bank` 
                             WHERE 
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul') ) A
-=======
                                 D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-30 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') ) A
->>>>>>> a282b697586014123fad6529ba17d2de33bcdefa
-=======
-                                D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-30 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') ) A
->>>>>>> a282b697586014123fad6529ba17d2de33bcdefa
+                                AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') 
+                          ) A
                           LEFT OUTER JOIN (
                             SELECT 
                                 ID 
                             FROM 
                                 `kb-daas-dev.master_200722.keyword_bank_nlp` 
                             WHERE 
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul') 
-=======
                                 CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-30 00:00:00', 'Asia/Seoul') 
                                 AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') 
->>>>>>> a282b697586014123fad6529ba17d2de33bcdefa
-=======
-                                CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-30 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') 
->>>>>>> a282b697586014123fad6529ba17d2de33bcdefa
                           ) B
                           ON A.ID = B.ID
                     ) A
                     WHERE
                       BID is null
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
                     LIMIT 100
->>>>>>> a282b697586014123fad6529ba17d2de33bcdefa
-=======
-                    LIMIT 100
->>>>>>> a282b697586014123fad6529ba17d2de33bcdefa
                 """,
                 project=project_id,
                 use_standard_sql=True)
