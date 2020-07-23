@@ -6,6 +6,7 @@ import json
 import time
 
 import googleapiclient.discovery
+from oauth2client.client import GoogleCredentials
 
 project_id = 'kb-daas-dev' # your project ID
 dataset_id = 'master_200722' # your dataset ID
@@ -49,7 +50,8 @@ def analyze_entities(text, encoding='UTF32'):
         'encoding_type': encoding,
     }
 
-    service = googleapiclient.discovery.build('language', 'v1')
+    credentials = GoogleCredentials.get_application_default()
+    service = googleapiclient.discovery.build('language', 'v1', credentials=credentials)
 
     request = service.documents().analyzeEntities(body=body)
     response = request.execute()
@@ -65,7 +67,8 @@ def analyze_sentiment(text, encoding='UTF32'):
         'encoding_type': encoding
     }
 
-    service = googleapiclient.discovery.build('language', 'v1')
+    credentials = GoogleCredentials.get_application_default()
+    service = googleapiclient.discovery.build('language', 'v1', credentials=credentials)
 
     request = service.documents().analyzeSentiment(body=body)
     response = request.execute()
@@ -165,10 +168,13 @@ class DateExtractor(beam.DoFn):
         #print(self, 'process', data_item)
         return [data_item]
 
-def main1():
+def main(argv):
 
     #schema = fileread('keyword_bank_result.schema')
     #print("schema", schema)
+    sday = argv[1]
+
+    print("sday:", sday)
 
     # for test
     pipeline = beam.Pipeline(options=options)
@@ -176,7 +182,7 @@ def main1():
     raw_data = (pipeline
         | 'Read Data From BigQuery' >> beam.io.Read(
             beam.io.BigQuerySource(
-                query="""
+                query=f"""
                     SELECT
                        ID
                        , D_CRAWLSTAMP
@@ -196,35 +202,23 @@ def main1():
                             FROM 
                                 `kb-daas-dev.master_200722.keyword_bank` 
                             WHERE 
-<<<<<<< HEAD
-                                D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul') ) A
-=======
-                                D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-30 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') ) A
->>>>>>> a282b697586014123fad6529ba17d2de33bcdefa
+                                D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-{sday} 00:00:00', 'Asia/Seoul') 
+                                AND TIMESTAMP_ADD(TIMESTAMP('2020-06-{sday} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
+                          ) A
                           LEFT OUTER JOIN (
                             SELECT 
                                 ID 
                             FROM 
                                 `kb-daas-dev.master_200722.keyword_bank_nlp` 
                             WHERE 
-<<<<<<< HEAD
-                                CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul') 
-=======
-                                CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-30 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') 
->>>>>>> a282b697586014123fad6529ba17d2de33bcdefa
+                                CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-{sday} 00:00:00', 'Asia/Seoul') 
+                                AND TIMESTAMP_ADD(TIMESTAMP('2020-06-{sday} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY) 
                           ) B
                           ON A.ID = B.ID
                     ) A
                     WHERE
                       BID is null
-<<<<<<< HEAD
-=======
                     LIMIT 100
->>>>>>> a282b697586014123fad6529ba17d2de33bcdefa
                 """,
                 project=project_id,
                 use_standard_sql=True)
@@ -263,4 +257,4 @@ def main1():
 
 if __name__ == '__main__':
     #print(fileread('keyword_bank_result.schema'))
-    main1()
+    main(sys.argv)

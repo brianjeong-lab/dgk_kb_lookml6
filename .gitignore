@@ -1,3 +1,6 @@
 operation/nodejs/node_modules
 __pycache__
 *.egg-info
+*nohup
+*.out
+*.out1
