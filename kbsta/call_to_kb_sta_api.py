@@ -19,6 +19,12 @@ options = {
 
 options = PipelineOptions(flags=[], **options)  # create and set your PipelineOptions
 
+class DefaultResponse:
+    text = ''
+    status_code = 0
+    proc_time = 0
+    err_msg = ''
+
 # 불필요한 특수문자 제거 전처리 함수
 def cleasing_contents(contents):
     remove_target_char = ["&", "="] # 본문에서 제거해야할 특수문자
@@ -58,7 +64,13 @@ def call_kbsta_api(content):
         response.err_msg = ''
    
     except Exception as e:
-        response = {"status_code":'999', "proc_time": time.time() - start, "err_msg": str(e)}
+        logging.warn("RESPONSE Error {}".format(e))
+
+        response = DefaultResponse()
+        response.text = ''
+        response.status_code = 999
+        response.proc_time = time.time() - start
+        response.err_msg = str(e)
     
     return response
 
@@ -67,12 +79,13 @@ def call_kbsta_api_with_json(content):
     # JSON 디코딩
     try:
         response = call_kbsta_api(content)
+
         json_array = json.loads(response.text)
         json_array["response"] = { "status_code" : response.status_code , "proc_time" : response.proc_time, "err_msg" : response.err_msg }
-
+        
         return json_array
     except Exception as e:
-        print("Exception : ", e)
+        logging.warn("call_kbsta_api Error {}".format(e))
         return None
 
 # formated
