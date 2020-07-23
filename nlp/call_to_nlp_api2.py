@@ -168,10 +168,13 @@ class DateExtractor(beam.DoFn):
         #print(self, 'process', data_item)
         return [data_item]
 
-def main1():
+def main(argv):
 
     #schema = fileread('keyword_bank_result.schema')
     #print("schema", schema)
+    sday = argv[1]
+
+    print("sday:", sday)
 
     # for test
     pipeline = beam.Pipeline(options=options)
@@ -179,7 +182,7 @@ def main1():
     raw_data = (pipeline
         | 'Read Data From BigQuery' >> beam.io.Read(
             beam.io.BigQuerySource(
-                query="""
+                query=f"""
                     SELECT
                        ID
                        , D_CRAWLSTAMP
@@ -199,16 +202,17 @@ def main1():
                             FROM 
                                 `kb-daas-dev.master_200722.keyword_bank` 
                             WHERE 
-                                D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-30 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') ) A
+                                D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-{sday} 00:00:00', 'Asia/Seoul') 
+                                AND TIMESTAMP_ADD(TIMESTAMP('2020-06-{sday} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
+                          ) A
                           LEFT OUTER JOIN (
                             SELECT 
                                 ID 
                             FROM 
                                 `kb-daas-dev.master_200722.keyword_bank_nlp` 
                             WHERE 
-                                CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-30 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') 
+                                CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-{sday} 00:00:00', 'Asia/Seoul') 
+                                AND TIMESTAMP_ADD(TIMESTAMP('2020-06-{sday} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY) 
                           ) B
                           ON A.ID = B.ID
                     ) A
@@ -253,4 +257,4 @@ def main1():
 
 if __name__ == '__main__':
     #print(fileread('keyword_bank_result.schema'))
-    main1()
+    main(sys.argv)
