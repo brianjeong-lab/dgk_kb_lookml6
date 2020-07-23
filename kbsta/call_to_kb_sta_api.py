@@ -7,6 +7,9 @@ import sys
 import json
 import time
 
+# import Python logging module.
+import logging
+
 project_id = 'kb-daas-dev' # your project ID
 #dataset_id = 'master' # your dataset ID
 #table_id = 'keyword_bank_result' # your table ID

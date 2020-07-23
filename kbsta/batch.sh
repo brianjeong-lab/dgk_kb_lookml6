@@ -4,7 +4,7 @@ echo "START `date`"
 
 for ((j=1;j<=100;j++))
 do
-    for i in 0 1 2 
+    for i in 2 0 1 
     do 
        echo "START ${j}-${i} : " `date`
        python call_to_kb_sta_api.py "${i}1" &
