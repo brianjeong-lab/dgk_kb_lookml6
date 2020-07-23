@@ -188,17 +188,45 @@ def main(pipeline_options, app_args):
         | '1. Read Data From BigQuery' >> beam.io.Read(
             beam.io.BigQuerySource(
                 query=f"""
-                    SELECT 
-                        ID
-                        , D_CRAWLSTAMP
-                        , D_WRITESTAMP
-                        , D_CONTENT 
-                    FROM 
-                        `{dataset}.{table}` 
-                    WHERE 
-                        D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul') 
-                        AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
-                    LIMIT 10
+SELECT 
+    A.ID
+    , A.D_CRAWLSTAMP
+    , A.D_WRITESTAMP
+    , A.D_CONTENT 
+FROM (
+  SELECT 
+      A.ID
+      , A.D_CRAWLSTAMP
+      , A.D_WRITESTAMP
+      , A.D_CONTENT 
+      , B.ID AS BID
+  FROM
+  (
+    SELECT 
+        ID
+        , D_CRAWLSTAMP
+        , D_WRITESTAMP
+        , D_CONTENT 
+    FROM 
+        `{dataset}.{table}` 
+    WHERE 
+        D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul') 
+        AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
+  ) A 
+  LEFT OUTER JOIN (
+      SELECT 
+        ID
+      FROM 
+          `{dataset}.{table}_nlp` 
+      WHERE 
+          CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul') 
+          AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
+  ) B
+  ON A.ID = B.ID
+) A
+WHERE
+  A.BID IS NULL
+LIMIT 100
                 """,
                 project=project,
                 use_standard_sql=True)

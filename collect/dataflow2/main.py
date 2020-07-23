@@ -1,5 +1,6 @@
 import csv
 import sys
+import time
 
 import argparse
 import apache_beam as beam
@@ -14,27 +15,33 @@ table_info = [
     ["ID", "integer"]                  #0
     , ["DOCID", "integer"]             #1
     , ["CHANNEL", "string"]
-    , ["S_SEQ", "integer"]             #3
+    , ["D_CRAWLSTAMP", "integer"]      #3
+    , ["S_SEQ", "integer"]             #4
     , ["S_NAME", "string"]
     , ["SB_NAME", "string"]
-    , ["D_CRAWLSTAMP", "integer"]      #6
     , ["D_TITLE", "string"]
     , ["D_URL", "string"]
     , ["D_CONTENT", "string"]
     , ["D_WRITER", "string"]
-    , ["D_WRITESTAMP", "timestamp"]   #11
-    , ["VIEW_COUNT", "integer"]       #12
-    , ["REPLY_COUNT", "integer"]      #13
-    , ["GOOD_COUNT", "integer"]       #14
-    , ["BAD_COUNT", "integer"]        #15
+    , ["D_WRITER_ID", "string"]
+    , ["D_WRITESTAMP", "timestamp"]   #12
+    #, ["VIEW_COUNT", "integer"]       #13
+    #, ["REPLY_COUNT", "integer"]      #14
+    #, ["GOOD_COUNT", "integer"]       #15
+    #, ["BAD_COUNT", "integer"]        #16
     , ["JSON_DATA", "string"]
+    , ["PROCSTAMP", "integer"]
 ]
 
-table_header = 'ID,DOCID,CHANNEL,S_SEQ,S_NAME,SB_NAME,D_CRAWLSTAMP,D_TITLE,D_URL,D_CONTENT,D_WRITER,D_WRITESTAMP,VIEW_COUNT,REPLY_COUNT,GOOD_COUNT,BAD_COUNT,JSON_DATA'.split(',')
-table_schema = 'ID:integer,DOCID:integer,CHANNEL:string,S_SEQ:integer,S_NAME:string,SB_NAME:string,D_CRAWLSTAMP:timestamp,D_TITLE:string,D_URL:string,D_CONTENT:string,D_WRITER:string,D_WRITESTAMP:timestamp,VIEW_COUNT:integer,REPLY_COUNT:integer,GOOD_COUNT:integer,BAD_COUNT:integer,JSON_DATA:string'
+
+#"ID","DOCID","CHANNEL","S_SEQ","S_NAME","SB_NAME","D_CRAWLSTAMP","D_TITLE","D_URL","D_CONTENT","D_WRITER","D_WRITER_ID","D_WRITESTAMP","JSON_DATA"
+
+table_header = 'ID,DOCID,CHANNEL,D_CRAWLSTAMP,S_SEQ,S_NAME,SB_NAME,D_TITLE,D_URL,D_CONTENT,D_WRITER,D_WRITER_ID,D_WRITESTAMP,JSON_DATA,PROCSTAMP'.split(',')
+table_schema = 'ID:integer,DOCID:integer,CHANNEL:string,D_CRAWLSTAMP:timestamp,S_SEQ:integer,S_NAME:string,SB_NAME:string,D_TITLE:string,D_URL:string,D_CONTENT:string,D_WRITER:string,D_WRITER_ID:string,D_WRITESTAMP:timestamp,JSON_DATA:string,PROCSTAMP:timestamp'
 
 # avoiding error : field larger than field limit (131072)
-csv.field_size_limit(1000000)
+csv.field_size_limit(sys.maxsize)
+curtimestamp = time.time()
 
 def cleansing(line):
     if line.count('\x00') > 0:
@@ -67,13 +74,38 @@ def create_row(fields):
     for name, value in zip(table_header, fields):
         featdict[name] = value
 
-    for i in [0, 1, 3, 6, 11, 12, 13, 14, 15]:
+    for i in [0, 1, 3, 4, 12]:
         try:
             featdict[table_info[i][0]] = int(featdict[table_info[i][0]])
         except:
+            logging.warn("Invalid {}'s Int value : {}={}".format(featdict["ID"], table_info[i][0], featdict[table_info[i][0]]))
+
+            # ID or DOCID is null
+            if i == 0 or i == 1:
+                # ignore it
+                logging.warn("Skip {}'s DATA {} {}".format(featdict["ID"], featdict["DOCID"], featdict["CHANNEL"]))
+                return
+
             featdict[table_info[i][0]] = 0
 
-    return featdict
+    featdict["PROCSTAMP"] = curtimestamp
+
+    # Validation 
+    # D_CRAWLTIMESTAMP
+    if featdict["D_CRAWLSTAMP"] > curtimestamp or featdict["D_CRAWLSTAMP"] < curtimestamp - 86400*365:
+        logging.warn("Invalid {}'s D_CRAWLSTAMP : {}".format(featdict["ID"], featdict["D_CRAWLSTAMP"]))
+        featdict["D_CRAWLSTAMP"] = featdict["D_WRITESTAMP"]
+        
+    # D_WRITESTAMP
+    if featdict["D_WRITESTAMP"] > curtimestamp or featdict["D_WRITESTAMP"] < curtimestamp - 86400*365:
+        logging.warn("Invalid  {}'s D_WRITESTAMP : {}".format(featdict["ID"], featdict["D_WRITESTAMP"]))
+
+        if featdict["D_CRAWLSTAMP"] > curtimestamp or featdict["D_CRAWLSTAMP"] < curtimestamp - 86400*365:
+            featdict["D_WRITESTAMP"] = featdict["D_CRAWLSTAMP"] = curtimestamp
+        else:
+            featdict["D_WRITESTAMP"] = featdict["D_CRAWLSTAMP"]
+
+    yield featdict
 
 def main(pipeline_args, app_args):
     # for test
@@ -98,13 +130,14 @@ def main(pipeline_args, app_args):
 
     bankdatas = (pipeline
         #| 'Load Data' >> beam.io.ReadFromText(f'{path}/{month}/{day}/{hour}.csv.gz')
-        | 'Load Data' >> beam.io.ReadFromText('gs://my_test_bk_0630/bank_data_0630/KBSTAR1_0616_0630_03.csv.gz')
-        | 'CSV Parser' >> beam.Map(lambda line: next(csv_reader(line)))
+        #| '1.Load Data' >> beam.io.ReadFromText(f'gs://kb-daas-dev-raw-data/new_rsn/bank/KBSTAR_은행키워드데이터_0601_0630_{hour}.csv')
+        | '1.Load Data' >> beam.io.ReadFromText(f'gs://kb-daas-dev-raw-data/new_rsn/corona/KBSTAR_코로나키워드데이터_0616_0630_{hour}.csv')
+        | '2.CSV Parser' >> beam.Map(lambda line: next(csv_reader(line)))
     )
 
     (bankdatas
-        | 'create Row' >> beam.Map(lambda fields: create_row(fields))  
-        | 'Loading to Bigquery' >> beam.io.WriteToBigQuery(
+        | '3.Create Row' >> beam.ParDo(create_row)  
+        | '4.Loading to Bigquery' >> beam.io.WriteToBigQuery(
         table=table,
         dataset=dataset,
         project=project,

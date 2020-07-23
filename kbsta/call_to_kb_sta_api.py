@@ -8,8 +8,8 @@ import json
 import time
 
 project_id = 'kb-daas-dev' # your project ID
-dataset_id = 'master' # your dataset ID
-table_id = 'keyword_bank_result' # your table ID
+#dataset_id = 'master' # your dataset ID
+#table_id = 'keyword_bank_result' # your table ID
 
 # for Standalone Test
 options = {
@@ -38,7 +38,9 @@ def call_kbsta_api(content):
     # AWS
     #url = "http://3.34.18.1:8080/analyze"
     # GCP
-    url = "http://34.64.172.194:28080/analyze"
+    #url = "http://34.64.172.194:28080/analyze"
+    # LB
+    url = "http://35.241.3.78:8080/analyze"
     querystring = {"tasks":"d2c,kpe,kse"}
     body = "text=" + content
     body = body.encode(encoding='utf-8')
@@ -56,7 +58,7 @@ def call_kbsta_api(content):
         response.err_msg = ''
    
     except Exception as e:
-        response = {"text":'', "status_code":'999', "proc_time": time.time() - start, "err_msg": str(e)}
+        response = {"status_code":'999', "proc_time": time.time() - start, "err_msg": str(e)}
     
     return response
 
@@ -101,9 +103,13 @@ def convert_kbsta_formatted_map(row):
         if 'response' in result.keys():
             response = result['response']
 
-    return {
+    yield {
         'ID':row['ID']
+        , 'CHANNEL':row['CHANNEL']
+        , 'S_NAME':row['S_NAME']
+        , 'SB_NAME':row['SB_NAME']
         , 'CRAWLSTAMP':row['D_CRAWLSTAMP']
+        , 'WRITESTAMP':row['D_WRITESTAMP']
         , 'SS': ss
         , 'D2C' : d2c
         , 'KPE' : kpe
@@ -134,10 +140,16 @@ class DateExtractor(beam.DoFn):
         #print(self, 'process', data_item)
         return [data_item]
 
-def main1():
+def main(argv):
 
     #schema = fileread('keyword_bank_result.schema')
     #print("schema", schema)
+
+    dataset = "master_200723"
+    table = "keyword_bank"
+    year = "2020"
+    month = "06"
+    day = sys.argv[1]
 
     # for test
     pipeline = beam.Pipeline(options=options)
@@ -145,16 +157,55 @@ def main1():
     raw_data = (pipeline
         | 'Read Data From BigQuery' >> beam.io.Read(
             beam.io.BigQuerySource(
-                query="""
-                    SELECT 
-                        ID
-                        , D_CRAWLSTAMP
-                        , D_CONTENT 
-                    FROM 
-                        `kb-daas-dev.master.keyword_bank` 
-                    WHERE 
-                        D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 02:00:00', 'Asia/Seoul') AND TIMESTAMP('2020-06-01 12:00:00', 'Asia/Seoul') 
-                    -- LIMIT 
+                query=f"""
+SELECT 
+    A.ID
+    , A.CHANNEL
+    , A.S_NAME
+    , A.SB_NAME
+    , A.D_CRAWLSTAMP
+    , A.D_WRITESTAMP
+    , A.D_CONTENT 
+FROM (
+  SELECT 
+      A.ID
+      , A.CHANNEL
+      , A.S_NAME
+      , A.SB_NAME
+      , A.D_CRAWLSTAMP
+      , A.D_WRITESTAMP
+      , A.D_CONTENT 
+      , B.ID AS BID
+  FROM
+  (
+    SELECT 
+        ID
+        , CHANNEL
+        , S_NAME
+        , SB_NAME
+        , D_CRAWLSTAMP
+        , D_WRITESTAMP
+        , D_CONTENT 
+    FROM 
+        `{dataset}.{table}` 
+    WHERE 
+        D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul') 
+        AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
+  ) A 
+  LEFT OUTER JOIN (
+      SELECT 
+        ID
+      FROM 
+          `{dataset}.{table}_result` 
+      WHERE 
+          CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul') 
+          AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
+  ) B
+  ON A.ID = B.ID
+) A
+WHERE
+  A.BID IS NULL
+LIMIT 100
                 """,
                 project=project_id,
                 use_standard_sql=True)
@@ -177,17 +228,17 @@ def main1():
         #| 'Testing' >> beam.Map(cleasing_contents)
         #| 'Testing 2' >> beam.GroupByKey()
         #| 'Testing 3' >> beam.Map(count_ones)
-        | 'Cleansing' >> beam.Map(lambda row: {'ID':row['ID'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_CONTENT':cleasing_contents(row['D_CONTENT'])})
-        | 'Call with KB STA API' >> beam.Map(lambda row: {'ID':row['ID'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_RESULT':call_kbsta_api_with_json(row['D_CONTENT'])})
-        | 'Trasfrom Result' >> beam.Map(lambda row: convert_kbsta_formatted_map(row))
+        | 'Cleansing' >> beam.Map(lambda row: {'ID':row['ID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'D_CONTENT':cleasing_contents(row['D_CONTENT'])})
+        | 'Call with KB STA API' >> beam.Map(lambda row: {'ID':row['ID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'D_RESULT':call_kbsta_api_with_json(row['D_CONTENT'])})
+        | 'Trasfrom Result' >> beam.ParDo(convert_kbsta_formatted_map)
     )
 
     (
         processing_data
         #| 'Write Data' >> beam.io.WriteToText('extracted_')
         | 'Loading to Bigquery' >> beam.io.WriteToBigQuery(
-            table=table_id,
-            dataset=dataset_id,
+            table=table+"_result",
+            dataset=dataset,
             project=project_id,
             #schema=schema,
             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
@@ -204,4 +255,4 @@ def main1():
 
 if __name__ == '__main__':
     #print(fileread('keyword_bank_result.schema'))
-    main1()
+    main(sys.argv)
