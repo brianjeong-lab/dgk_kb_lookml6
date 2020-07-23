@@ -6,7 +6,6 @@ import json
 import time
 
 import googleapiclient.discovery
-from oauth2client.client import GoogleCredentials
 
 project_id = 'kb-daas-dev' # your project ID
 dataset_id = 'master_200722' # your dataset ID
@@ -51,8 +50,7 @@ def analyze_entities(text, encoding='UTF32'):
         'encoding_type': encoding,
     }
 
-    credentials = GoogleCredentials.get_application_default()
-    service = googleapiclient.discovery.build('language', 'v1', credentials=credentials)
+    service = googleapiclient.discovery.build('language', 'v1')
 
     request = service.documents().analyzeEntities(body=body)
     response = request.execute()
@@ -68,8 +66,7 @@ def analyze_sentiment(text, encoding='UTF32'):
         'encoding_type': encoding
     }
 
-    credentials = GoogleCredentials.get_application_default()
-    service = googleapiclient.discovery.build('language', 'v1', credentials=credentials)
+    service = googleapiclient.discovery.build('language', 'v1')
 
     request = service.documents().analyzeSentiment(body=body)
     response = request.execute()
@@ -170,17 +167,40 @@ def main1():
         | 'Read Data From BigQuery' >> beam.io.Read(
             beam.io.BigQuerySource(
                 query="""
-                    SELECT 
-                        ID
-                        , D_CRAWLSTAMP
-                        , D_WRITESTAMP
-                        , D_CONTENT 
-                    FROM 
-                        `kb-daas-dev.master_200722.keyword_bank` 
-                    WHERE 
-                        D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
-                        AND TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul') 
-                    LIMIT 1
+                    SELECT
+                       ID
+                       , D_CRAWLSTAMP
+                       , D_WRITESTAMP
+                       , D_CONTENT
+                    FROM (
+                      SELECT 
+                           A.ID
+                          , A.D_CRAWLSTAMP
+                          , A.D_WRITESTAMP
+                          , A.D_CONTENT 
+                          , B.ID as BID
+                      FROM 
+                          (
+                            SELECT 
+                                *
+                            FROM 
+                                `kb-daas-dev.master_200722.keyword_bank` 
+                            WHERE 
+                                D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
+                                AND TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul') ) A
+                          LEFT OUTER JOIN (
+                            SELECT 
+                                ID 
+                            FROM 
+                                `kb-daas-dev.master_200722.keyword_bank_nlp` 
+                            WHERE 
+                                CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
+                                AND TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul') 
+                          ) B
+                          ON A.ID = B.ID
+                    ) A
+                    WHERE
+                      BID is null
                 """,
                 project=project_id,
                 use_standard_sql=True)
