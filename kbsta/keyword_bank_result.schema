@@ -6,9 +6,33 @@
     "type": "INTEGER"
   },
   {
+    "description": "Channel Info",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "SB Name",
+    "mode": "REQUIRED",
+    "name": "SB_NAME",
+    "type": "STRING"
+  },
+  {
     "description": "Crawler Time",
     "mode": "REQUIRED",
     "name": "CRAWLSTAMP",
+    "type": "TIMESTAMP"
+  },
+  {
+    "description": "Source Wrote Time",
+    "mode": "REQUIRED",
+    "name": "WRITESTAMP",
     "type": "TIMESTAMP"
   },
   {
