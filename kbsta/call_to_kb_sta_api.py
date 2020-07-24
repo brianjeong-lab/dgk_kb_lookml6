@@ -67,7 +67,7 @@ def call_kbsta_api(content):
         response.err_msg = ''
    
     except Exception as e:
-        logging.warn("RESPONSE Error {}".format(e))
+        logging.warning("RESPONSE Error {}".format(e))
 
         response = DefaultResponse()
         response.text = ''
@@ -83,12 +83,16 @@ def call_kbsta_api_with_json(content):
     try:
         response = call_kbsta_api(content)
 
-        json_array = json.loads(response.text)
+        if response.status_code != 999:
+            json_array = json.loads(response.text)
+        else:
+            json_array = {}
+
         json_array["response"] = { "status_code" : response.status_code , "proc_time" : response.proc_time, "err_msg" : response.err_msg }
         
         return json_array
     except Exception as e:
-        logging.warn("call_kbsta_api Error {}".format(e))
+        logging.warning("call_kbsta_api Error {}".format(e))
         return None
 
 # formated
