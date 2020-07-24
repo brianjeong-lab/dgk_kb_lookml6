@@ -1,0 +1,72 @@
+[
+  {
+    "mode": "NULLABLE",
+    "name": "ID",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "DOCID",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "S_SEQ",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "SB_NAME",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "D_CRAWLSTAMP",
+    "type": "TIMESTAMP"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "D_TITLE",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "D_URL",
+    "type": "STRING"
+  },
+  {
+   "mode": "NULLABLE",
+   "name": "D_CONTENT",
+   "type": "STRING"
+ },
+ {
+   "mode": "NULLABLE",
+   "name": "D_WRITER",
+   "type": "STRING"
+ },
+ {
+   "mode": "NULLABLE",
+   "name": "D_WRITER_ID",
+   "type": "STRING"
+ },
+ {
+   "mode": "NULLABLE",
+   "name": "D_WRITESTAMP",
+   "type": "TIMESTAMP"
+ },
+ {
+   "mode": "NULLABLE",
+   "name": "JSON_DATA",
+   "type": "STRING"
+ }
+]
