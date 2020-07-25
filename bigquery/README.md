@@ -98,3 +98,11 @@ cross join unnest(d2c) b
 where  DATE(CRAWLSTAMP) > "2020-05-20"
 and b.label = '여행'
 ```
+
+# YouTube Table Information
+```
+[https://cloud.google.com/bigquery-transfer/docs/youtube-channel-transformation](https://cloud.google.com/bigquery-transfer/docs/youtube-channel-transformation)
+
+무료라 그런지 쓸만한 데이터는 Likes, DisLikes, Share 정보정도밖에 없음 (당연한건가?)
+심지어 채널ID 및 VideoID도 암호화되어 있어서.... 디테일하게 뭔가 보여줄순 
+````
