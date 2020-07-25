@@ -106,3 +106,27 @@ and b.label = '여행'
 무료라 그런지 쓸만한 데이터는 Likes, DisLikes, Share 정보정도밖에 없음 (당연한건가?)
 심지어 채널ID 및 VideoID도 암호화되어 있어서.... 디테일하게 뭔가 보여줄순 
 ````
+
+# 시나리오 EDA SQL (데이터를 좀 더 봐야할듯)
+```
+SELECT id
+     , channel
+     , s_name
+     , sb_name
+     , d_title
+     , d_content
+     , d_url
+     , json_data
+  FROM `kb-daas-dev.master_200723.keyword_channel_addtion` a
+  WHERE DATE( D_CRAWLSTAMP ) > "2020-07-01"
+    and id in (SELECT id
+                FROM `kb-daas-dev.master_200723.keyword_channel_addtion_result` a
+                cross join unnest(kpe) b
+                cross join unnest(d2c) c
+                WHERE DATE(WRITESTAMP) > "2020-07-01"
+                  and b.keyword like '%계좌%'
+                  and (c.label   like '%경제%' or c.label   like '%사회%')
+                group by id)
+;
+
+````
