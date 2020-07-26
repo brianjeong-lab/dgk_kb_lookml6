@@ -6,6 +6,12 @@
     "type": "INTEGER"
   },
   {
+    "description": "ID",
+    "mode": "REQUIRED",
+    "name": "ID",
+    "type": "INTEGER"
+  },
+  {
     "description": "Channel",
     "mode": "REQUIRED",
     "name": "CHANNEL",
@@ -18,27 +24,21 @@
     "type": "STRING"
   },
   {
-    "description": "Keyword",
-    "mode": "REQUIRED",
-    "name": "KEYWORD",
+    "description": "SB Name",
+    "mode": "NULLABLE",
+    "name": "SB_NAME",
     "type": "STRING"
   },
   {
-    "description": "The wrote day",
+    "description": "The written day",
     "mode": "REQUIRED",
     "name": "WRITE_DAY",
     "type": "INTEGER"
   },
   {
-    "description": "Count",
+    "description": "Keyword",
     "mode": "REQUIRED",
-    "name": "CNT",
-    "type": "INTEGER"
-  },
-  {
-    "description": "Sum of score",
-    "mode": "REQUIRED",
-    "name": "SUM_SCORE",
-    "type": "FLOAT"
+    "name": "KEYWORD",
+    "type": "STRING"
   }
 ]
