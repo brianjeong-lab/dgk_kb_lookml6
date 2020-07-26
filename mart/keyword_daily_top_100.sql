@@ -26,7 +26,7 @@ FROM (
       , KEYWORD
       , SUM(CNT) AS CNT
     FROM
-      `kb-daas-dev.mart_200723.keyword_1_more`
+      `kb-daas-dev.mart_200723.keyword_2_more`
     WHERE
       WRITE_DAY BETWEEN 20200601 AND 20200630
     GROUP BY
