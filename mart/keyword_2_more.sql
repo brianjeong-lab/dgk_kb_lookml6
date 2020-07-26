@@ -10,6 +10,6 @@ SELECT
   , CNT
   , SUM_SCORE
 FROM
-  `kb-daas-dev.mart_200723.keyword_sum`
+  `kb-daas-dev.mart_200723.keyword`
 WHERE
   CNT > 1
