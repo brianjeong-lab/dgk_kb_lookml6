@@ -1,5 +1,5 @@
 # for bank keyword
-INSERT INTO `kb-daas-dev.mart_200723.keyword` (
+INSERT INTO `kb-daas-dev.mart_200723.keyword_sum` (
     TYPE, CHANNEL, S_NAME, WRITE_DAY, KEYWORD, CNT, SUM_SCORE
 ) 
 SELECT
@@ -21,7 +21,7 @@ GROUP BY channel, s_name, day, keyword;
 
 
 # for corona keyword
-INSERT INTO `kb-daas-dev.mart_200723.keyword` (
+INSERT INTO `kb-daas-dev.mart_200723.keyword_sum` (
     TYPE, CHANNEL, S_NAME, WRITE_DAY, KEYWORD, CNT, SUM_SCORE
 ) 
 SELECT
