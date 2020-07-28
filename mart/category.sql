@@ -27,7 +27,7 @@ INSERT INTO `kb-daas-dev.mart_200723.category` (
     TYPE, CHANNEL, CATEGORY, KEYWORD, WRITE_DAY, CNT, SUM_SCORE, CNT_DOC
 ) 
 SELECT
-  1 AS type
+  2 AS type
   , A.CHANNEL AS channel
   , A.D2C[SAFE_OFFSET(0)].label AS category
   , K.keyword AS keyword
