@@ -22,7 +22,8 @@ FROM (
       , SUM(CNT) AS CNT
       , SUM(CNT_DOC) AS CNT_DOC
     FROM
-      `kb-daas-dev.mart_200723.category`
+      --`kb-daas-dev.mart_200723.category`
+      `kb-daas-dev.mart_200723.category_keyword_daily_top_100`
     WHERE
       WRITE_DAY BETWEEN 20200601 AND 20200630
     GROUP BY
