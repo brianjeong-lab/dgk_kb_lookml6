@@ -14,7 +14,7 @@
   {
     "description": "Category",
     "mode": "REQUIRED",
-    "name": "S_NAME",
+    "name": "CATEGORY",
     "type": "STRING"
   },
   {
@@ -46,5 +46,5 @@
     "mode": "REQUIRED",
     "name": "CNT_DOC",
     "type": "INTEGER"
-  },
+  }
 ]
