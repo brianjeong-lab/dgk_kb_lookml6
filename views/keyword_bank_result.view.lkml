@@ -91,6 +91,12 @@ view: keyword_bank_result {
     sql: ${TABLE}.WRITESTAMP ;;
   }
 
+  dimension: ARR {
+    type: string
+
+    sql: ARRAY_AGG(STRUCT(${TABLE}.ID, ${TABLE}.kpe) ORDER BY ${TABLE}.KPE.score DESC) ARR   ;;
+  }
+
   measure: count {
     type: count
     drill_fields: [id, s_name, sb_name]
