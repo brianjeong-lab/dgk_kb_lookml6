@@ -79,11 +79,10 @@ def call_kbsta_api(content):
 
 
 def call_kbsta_api_with_json(content):
-
-    response = call_kbsta_api(content)
-
     # JSON 디코딩
     try:
+        response = call_kbsta_api(content)
+
         if response.status_code != 999:
             json_array = json.loads(response.text)
         else:
@@ -93,7 +92,7 @@ def call_kbsta_api_with_json(content):
         
         return json_array
     except Exception as e:
-        logging.warning("call_kbsta_api Error {} {} ".format(e, len(content)))
+        logging.warning("call_kbsta_api Error {}".format(e))
         return None
 
 # formated
@@ -167,10 +166,11 @@ def main(argv):
     #print("schema", schema)
 
     dataset = "master_200723"
-    table = "keyword_bank"
+    table = "keyword_corona"
     year = "2020"
     month = "06"
     day = sys.argv[1]
+    hour = sys.argv[2]
 
     # for test
     pipeline = beam.Pipeline(options=options)
@@ -210,8 +210,8 @@ FROM (
     FROM 
         `{dataset}.{table}` 
     WHERE 
-        D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul') 
-        AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
+        D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul') 
+        AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
   ) A 
   LEFT OUTER JOIN (
       SELECT 
@@ -219,15 +219,14 @@ FROM (
       FROM 
           `{dataset}.{table}_result` 
       WHERE 
-          CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul') 
-          AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
+          CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul') 
+          AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
   ) B
   ON A.ID = B.ID
 ) A
 WHERE
   A.BID IS NULL
-  AND LENGTH(A.D_CONTENT) != 100000
-LIMIT 500
+LIMIT 1000
                 """,
                 project=project_id,
                 use_standard_sql=True)

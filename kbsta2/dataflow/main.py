@@ -1,4 +1,6 @@
+import argparse
 import apache_beam as beam
+from apache_beam.options.pipeline_options import SetupOptions
 from apache_beam.options.pipeline_options import PipelineOptions, StandardOptions
 from apache_beam.io.gcp.internal.clients.bigquery import bigquery_v2_messages
 import requests
@@ -10,23 +12,6 @@ import time
 # import Python logging module.
 import logging
 
-project_id = 'kb-daas-dev' # your project ID
-#dataset_id = 'master' # your dataset ID
-#table_id = 'keyword_bank_result' # your table ID
-
-# for Standalone Test
-options = {
-    'project': project_id,
-    'runner:': 'DirectRunner'
-    }
-
-options = PipelineOptions(flags=[], **options)  # create and set your PipelineOptions
-
-class DefaultResponse:
-    text = ''
-    status_code = 0
-    proc_time = 0
-    err_msg = ''
 
 # 불필요한 특수문자 제거 전처리 함수
 def cleasing_contents(contents):
@@ -47,9 +32,10 @@ def call_kbsta_api(content):
     # AWS
     #url = "http://3.34.18.1:8080/analyze"
     # GCP
-    #url = "http://34.64.172.194:28080/analyze"
+    url = "http://34.64.172.194:28080/analyze" 
+    #url = "http://34.64.187.246:28080/analyze" # -1
     # LB
-    url = "http://35.241.3.78:8080/analyze"
+    #url = "http://35.241.3.78:8080/analyze"
     querystring = {"tasks":"d2c,kpe,kse"}
     body = "text=" + content
     body = body.encode(encoding='utf-8')
@@ -67,33 +53,22 @@ def call_kbsta_api(content):
         response.err_msg = ''
    
     except Exception as e:
-        logging.warning("RESPONSE Error {}".format(e))
-
-        response = DefaultResponse()
-        response.text = ''
-        response.status_code = 999
-        response.proc_time = time.time() - start
-        response.err_msg = str(e)
+        logging.error(str(e))
+        response = {"text":'', "status_code":'999', "proc_time": time.time() - start, "err_msg": str(e)}
     
     return response
 
 
 def call_kbsta_api_with_json(content):
-
-    response = call_kbsta_api(content)
-
     # JSON 디코딩
     try:
-        if response.status_code != 999:
-            json_array = json.loads(response.text)
-        else:
-            json_array = {}
-
+        response = call_kbsta_api(content)
+        json_array = json.loads(response.text)
         json_array["response"] = { "status_code" : response.status_code , "proc_time" : response.proc_time, "err_msg" : response.err_msg }
-        
+
         return json_array
     except Exception as e:
-        logging.warning("call_kbsta_api Error {} {} ".format(e, len(content)))
+        logging.error(str(e))
         return None
 
 # formated
@@ -124,13 +99,9 @@ def convert_kbsta_formatted_map(row):
         if 'response' in result.keys():
             response = result['response']
 
-    yield {
+    return {
         'ID':row['ID']
-        , 'CHANNEL':row['CHANNEL']
-        , 'S_NAME':row['S_NAME']
-        , 'SB_NAME':row['SB_NAME']
         , 'CRAWLSTAMP':row['D_CRAWLSTAMP']
-        , 'WRITESTAMP':row['D_WRITESTAMP']
         , 'SS': ss
         , 'D2C' : d2c
         , 'KPE' : kpe
@@ -161,38 +132,39 @@ class DateExtractor(beam.DoFn):
         #print(self, 'process', data_item)
         return [data_item]
 
-def main(argv):
+def main(pipeline_options, app_args):
 
     #schema = fileread('keyword_bank_result.schema')
     #print("schema", schema)
 
-    dataset = "master_200723"
-    table = "keyword_bank"
-    year = "2020"
-    month = "06"
-    day = sys.argv[1]
+    pipeline = beam.Pipeline(options=pipeline_options)
 
-    # for test
-    pipeline = beam.Pipeline(options=options)
+    year = app_args.input_year
+    month = app_args.input_month
+    day = app_args.input_day
+    hour = app_args.input_hour
+
+    project = app_args.bq_project
+    dataset = app_args.bq_dataset
+    table = app_args.bq_table
+
+    logging.info(f'[Start] Project : {project}') 
+    logging.info(f'base date : {year}-{month}-{day} {hour}:00:00')
+    logging.info(f'dataset : {dataset}')
+    logging.info(f'table : {table}')
 
     raw_data = (pipeline
-        | 'Read Data From BigQuery' >> beam.io.Read(
+        | '1.Read Data From BigQuery' >> beam.io.Read(
             beam.io.BigQuerySource(
                 query=f"""
 SELECT 
     A.ID
-    , A.CHANNEL
-    , A.S_NAME
-    , A.SB_NAME
     , A.D_CRAWLSTAMP
     , A.D_WRITESTAMP
     , A.D_CONTENT 
 FROM (
   SELECT 
       A.ID
-      , A.CHANNEL
-      , A.S_NAME
-      , A.SB_NAME
       , A.D_CRAWLSTAMP
       , A.D_WRITESTAMP
       , A.D_CONTENT 
@@ -201,9 +173,6 @@ FROM (
   (
     SELECT 
         ID
-        , CHANNEL
-        , S_NAME
-        , SB_NAME
         , D_CRAWLSTAMP
         , D_WRITESTAMP
         , D_CONTENT 
@@ -226,42 +195,24 @@ FROM (
 ) A
 WHERE
   A.BID IS NULL
-  AND LENGTH(A.D_CONTENT) != 100000
-LIMIT 500
                 """,
-                project=project_id,
+                project=project,
                 use_standard_sql=True)
         )
     )
 
-    # raw_data = (pipeline 
-    #     | beam.Create(
-    #         [
-    #             'a',
-    #             "b",
-    #             'c',
-    #             'e',
-    #         ]
-    #     )
-    # )
-
     processing_data = (raw_data
-        #| 'Testing' >> beam.ParDo(DateExtractor())
-        #| 'Testing' >> beam.Map(cleasing_contents)
-        #| 'Testing 2' >> beam.GroupByKey()
-        #| 'Testing 3' >> beam.Map(count_ones)
-        | 'Cleansing' >> beam.Map(lambda row: {'ID':row['ID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'D_CONTENT':cleasing_contents(row['D_CONTENT'])})
-        | 'Call with KB STA API' >> beam.Map(lambda row: {'ID':row['ID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'D_RESULT':call_kbsta_api_with_json(row['D_CONTENT'])})
-        | 'Trasfrom Result' >> beam.ParDo(convert_kbsta_formatted_map)
+        | '2.Cleansing' >> beam.Map(lambda row: {'ID':row['ID'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_CONTENT':cleasing_contents(row['D_CONTENT'])})
+        | '3.Call with KB STA API' >> beam.Map(lambda row: {'ID':row['ID'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_RESULT':call_kbsta_api_with_json(row['D_CONTENT'])})
+        | '4.Trasfrom Result' >> beam.Map(lambda row: convert_kbsta_formatted_map(row))
     )
 
     (
         processing_data
-        #| 'Write Data' >> beam.io.WriteToText('extracted_')
-        | 'Loading to Bigquery' >> beam.io.WriteToBigQuery(
-            table=table+"_result",
+        | '5.Loading to Bigquery' >> beam.io.WriteToBigQuery(
+            table=f'{table}_result',
             dataset=dataset,
-            project=project_id,
+            project=project,
             #schema=schema,
             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
             write_disposition=beam.io.BigQueryDisposition.WRITE_APPEND,
@@ -270,11 +221,26 @@ LIMIT 500
         )
     )
 
-    #pipeline.run()
     result = pipeline.run()
     result.wait_until_finish()
 
 
 if __name__ == '__main__':
-    #print(fileread('keyword_bank_result.schema'))
-    main(sys.argv)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input.year", dest="input_year", required=True, help="Year for input data")
+    parser.add_argument("--input.month", dest="input_month", required=True, help="Month for input data")
+    parser.add_argument("--input.day", dest="input_day", required=True, help="Day for input data")
+    parser.add_argument("--input.hour", dest="input_hour", required=True, help="Hour for input data")
+    
+    parser.add_argument("--bq.project", dest="bq_project", required=True, help="Project Name for Bigquery")
+    parser.add_argument("--bq.dataset", dest="bq_dataset", required=True, help="Dataset Name for Bigquery")
+    parser.add_argument("--bq.table", dest="bq_table", required=True, help="Table Name for Bigquery")
+    
+    app_args, pipeline_args = parser.parse_known_args()
+    pipeline_options = PipelineOptions(pipeline_args)
+    pipeline_options.view_as(SetupOptions).save_main_session = True
+
+    logging.getLogger().setLevel(logging.INFO)
+
+    main(pipeline_options, app_args)

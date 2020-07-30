@@ -226,7 +226,7 @@ FROM (
 ) A
 WHERE
   A.BID IS NULL
-LIMIT 100
+LIMIT 500
                 """,
                 project=project_id,
                 use_standard_sql=True)

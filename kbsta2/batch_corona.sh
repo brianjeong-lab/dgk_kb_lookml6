@@ -2,11 +2,11 @@
 
 echo "START `date`"
 
-for ((j=1;j<=1;j++))
+for ((j=1;j<=100;j++))
 do
     #for i in 17 18 19 20 21 22 23 24 25 26 27 28 29 30 16
     #for i in 23 24 25 26 27 28 29 30
-    for i in 19 18 17 16 
+    for i in 17 18 19 20 21 22 
     do 
        echo "START ${j}-${i} : " `date`
        python call_to_kb_sta_api_corona.py "${i}" "00" &
@@ -33,7 +33,7 @@ do
        python call_to_kb_sta_api_corona.py "${i}" "21" &
        python call_to_kb_sta_api_corona.py "${i}" "22" &
        python call_to_kb_sta_api_corona.py "${i}" "23" &
-       python call_to_kb_sta_api_corona.py "${i}" "09" &
+       python call_to_kb_sta_api_corona.py "${i}" "09" 
        echo "END ${j}-${i} : " `date`
     done
 done

@@ -6,6 +6,7 @@ import csv
 import sys
 import json
 import time
+import re
 
 # import Python logging module.
 import logging
@@ -50,8 +51,13 @@ def call_kbsta_api(content):
     #url = "http://34.64.172.194:28080/analyze"
     # LB
     url = "http://35.241.3.78:8080/analyze"
-    querystring = {"tasks":"d2c,kpe,kse"}
-    body = "text=" + content
+    querystring = {"tasks":"d2c,kpe,kse,bnlp,ner"}
+    #body = "text=" + re.sub(r'[\xa0]', '', content)
+    body = "text=" + re.sub('[_=#/?:$}&^·\xa0]', '', content)
+    #body = "text=" + content
+    #print("body", body)
+    #print(content[1111], content[1112])
+    #print(hex(ord(content[1111])), hex(ord(content[1112])))
     body = body.encode(encoding='utf-8')
     headers = {
         'apikey': "5rbeC7bMzbynvbcNqGwOnp5Tll2PUB9B",
@@ -65,6 +71,9 @@ def call_kbsta_api(content):
         response = requests.request("POST", url, data=body, headers=headers, params=querystring)
         response.proc_time = time.time() - start
         response.err_msg = ''
+
+        #print("Response", response)
+        #print("Text", response.text)
    
     except Exception as e:
         logging.warning("RESPONSE Error {}".format(e))
@@ -78,7 +87,7 @@ def call_kbsta_api(content):
     return response
 
 
-def call_kbsta_api_with_json(content):
+def call_kbsta_api_with_json(docid, content):
 
     response = call_kbsta_api(content)
 
@@ -93,8 +102,10 @@ def call_kbsta_api_with_json(content):
         
         return json_array
     except Exception as e:
-        logging.warning("call_kbsta_api Error {} {} ".format(e, len(content)))
-        return None
+        logging.warning("call_kbsta_api Error docid:{} {} {} ".format(docid, e, len(content)))
+        json_array = {}
+        json_array["response"] = { "status_code" : 900 , "proc_time" : 0, "err_msg" : str(e) }
+        return json_array
 
 # formated
 def convert_kbsta_formatted_map(row):
@@ -109,8 +120,10 @@ def convert_kbsta_formatted_map(row):
 
         result = row['D_RESULT']
 
-        if 'ss' in result.keys():
-            ss = result['ss']
+        if 'sentence' in result.keys():
+            sentences = result['sentence']
+            for sentence in sentences:
+                ss.append(sentence["raw"])
 
         if 'd2c' in result.keys():
             d2c = result['d2c'] 
@@ -125,7 +138,7 @@ def convert_kbsta_formatted_map(row):
             response = result['response']
 
     yield {
-        'ID':row['ID']
+        'DOCID':row['DOCID']
         , 'CHANNEL':row['CHANNEL']
         , 'S_NAME':row['S_NAME']
         , 'SB_NAME':row['SB_NAME']
@@ -166,7 +179,7 @@ def main(argv):
     #schema = fileread('keyword_bank_result.schema')
     #print("schema", schema)
 
-    dataset = "master_200723"
+    dataset = "master_200729"
     table = "keyword_bank"
     year = "2020"
     month = "06"
@@ -175,12 +188,9 @@ def main(argv):
     # for test
     pipeline = beam.Pipeline(options=options)
 
-    raw_data = (pipeline
-        | 'Read Data From BigQuery' >> beam.io.Read(
-            beam.io.BigQuerySource(
-                query=f"""
+    query=f"""
 SELECT 
-    A.ID
+    A.DOCID
     , A.CHANNEL
     , A.S_NAME
     , A.SB_NAME
@@ -189,18 +199,18 @@ SELECT
     , A.D_CONTENT 
 FROM (
   SELECT 
-      A.ID
+      A.DOCID
       , A.CHANNEL
       , A.S_NAME
       , A.SB_NAME
       , A.D_CRAWLSTAMP
       , A.D_WRITESTAMP
       , A.D_CONTENT 
-      , B.ID AS BID
+      , B.DOCID AS BID
   FROM
   (
     SELECT 
-        ID
+        DOCID
         , CHANNEL
         , S_NAME
         , SB_NAME
@@ -215,20 +225,42 @@ FROM (
   ) A 
   LEFT OUTER JOIN (
       SELECT 
-        ID
+        DOCID
       FROM 
           `{dataset}.{table}_result` 
       WHERE 
           CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul') 
           AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
   ) B
-  ON A.ID = B.ID
+  ON A.DOCID = B.DOCID
 ) A
 WHERE
   A.BID IS NULL
-  AND LENGTH(A.D_CONTENT) != 100000
-LIMIT 500
-                """,
+  -- AND LENGTH(A.D_CONTENT) != 100000
+LIMIT 250
+                """
+
+    query=f"""
+SELECT 
+    A.DOCID
+    , A.CHANNEL
+    , A.S_NAME
+    , A.SB_NAME
+    , A.D_CRAWLSTAMP
+    , A.D_WRITESTAMP
+    , A.D_CONTENT 
+FROM 
+    `master_200729.keyword_bank` A
+WHERE 
+    D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-09 22:00:00', 'Asia/Seoul') 
+    AND TIMESTAMP_ADD(TIMESTAMP('2020-06-09 22:00:00', 'Asia/Seoul'), INTERVAL 1 HOUR)
+    AND DOCID = 7419868596
+"""
+
+    raw_data = (pipeline
+        | 'Read Data From BigQuery' >> beam.io.Read(
+            beam.io.BigQuerySource(
+                query=query,
                 project=project_id,
                 use_standard_sql=True)
         )
@@ -250,8 +282,8 @@ LIMIT 500
         #| 'Testing' >> beam.Map(cleasing_contents)
         #| 'Testing 2' >> beam.GroupByKey()
         #| 'Testing 3' >> beam.Map(count_ones)
-        | 'Cleansing' >> beam.Map(lambda row: {'ID':row['ID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'D_CONTENT':cleasing_contents(row['D_CONTENT'])})
-        | 'Call with KB STA API' >> beam.Map(lambda row: {'ID':row['ID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'D_RESULT':call_kbsta_api_with_json(row['D_CONTENT'])})
+        | 'Cleansing' >> beam.Map(lambda row: {'DOCID':row['DOCID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'D_CONTENT':cleasing_contents(row['D_CONTENT'])})
+        | 'Call with KB STA API' >> beam.Map(lambda row: {'DOCID':row['DOCID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'D_RESULT':call_kbsta_api_with_json(row['DOCID'], row['D_CONTENT'])})
         | 'Trasfrom Result' >> beam.ParDo(convert_kbsta_formatted_map)
     )
 
