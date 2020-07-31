@@ -25,6 +25,13 @@ and kbr.id = kpeTable.id
 
  ;;
   }
+  filter: STARTDATE {
+    type: date
+  }
+
+  filter: ENDDATE {
+    type: date
+  }
 
   filter: WORD {
     type: string
