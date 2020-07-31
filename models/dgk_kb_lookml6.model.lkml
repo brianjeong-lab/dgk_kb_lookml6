@@ -120,4 +120,16 @@ explore: keyword_corona_result {
     sql: LEFT JOIN UNNEST([${keyword_corona_result.response}]) as keyword_corona_result__response ;;
     relationship: one_to_one
   }
+
+
+}
+
+explore: tree{}
+
+explore: tree2{
+  cancel_grouping_fields: [tree2.search_keyword, tree2.keyword]
+}
+
+explore: tree3{
+  cancel_grouping_fields: [tree3.search_keyword, tree3.keyword]
 }
