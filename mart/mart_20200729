@@ -292,3 +292,149 @@ WHERE
   A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
   AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
 
+
+-- sentence
+-- PARTITION : WRITE_DAY
+-- CLUSTER : DOCID
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "ID",
+    "mode": "NULLABLE",
+    "name": "ID",
+    "type": "INTEGER"
+  },
+{
+    "description": "Document ID",
+    "mode": "REQUIRED",
+    "name": "DOCID",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "SB Name",
+    "mode": "NULLABLE",
+    "name": "SB_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "The Written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The category of document",
+    "mode": "NULLABLE",
+    "name": "CATEGORY",
+    "type": "STRING"
+  },
+  {
+    "description": "1'st Main Setence",
+    "mode": "NULLABLE",
+    "name": "SENTENCE1",
+    "type": "STRING"
+  },
+  {
+    "description": "2'nd Main Setence",
+    "mode": "NULLABLE",
+    "name": "SENTENCE2",
+    "type": "STRING"
+  },
+  {
+    "description": "3'rd Main Setence",
+    "mode": "NULLABLE",
+    "name": "SENTENCE3",
+    "type": "STRING"
+  }
+]
+
+
+# for bank keyword
+INSERT INTO `kb-daas-dev.mart_200729.sentence` (
+  TYPE, ID, DOCID, CHANNEL, S_NAME, SB_NAME, WRITE_DAY, CATEGORY, SENTENCE1, SENTENCE2, SENTENCE3
+) 
+SELECT
+  1 AS type
+  , NULL AS ID
+  , A.DOCID AS DOCID
+  , A.CHANNEL AS CHANNEL
+  , A.S_NAME AS S_NAME
+  , A.SB_NAME AS SB_NAME
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , (CASE 
+      WHEN ARRAY_LENGTH(D2C) > 0 THEN D2C[SAFE_OFFSET(0)].label
+      ELSE NULL
+    END) AS CATEGORY
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 0 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(0)].idx)]
+      ELSE NULL
+    END) AS SENTENCE1
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 1 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(1)].idx)]
+      ELSE NULL
+    END) AS SENTENCE2
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 2 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(2)].idx)]
+      ELSE NULL
+    END) AS SENTENCE3
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  --AND A.CRAWLSTAMP < TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP, 'Asia/Seoul') BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
+
+
+# for corona keyword
+INSERT INTO `kb-daas-dev.mart_200729.sentence` (
+  TYPE, ID, DOCID, CHANNEL, S_NAME, SB_NAME, WRITE_DAY, CATEGORY, SENTENCE1, SENTENCE2, SENTENCE3
+) 
+SELECT
+  2 AS type
+  , NULL AS ID
+  , A.DOCID AS DOCID
+  , A.CHANNEL AS CHANNEL
+  , A.S_NAME AS S_NAME
+  , A.SB_NAME AS SB_NAME
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , (CASE 
+      WHEN ARRAY_LENGTH(D2C) > 0 THEN D2C[SAFE_OFFSET(0)].label
+      ELSE NULL
+    END) AS CATEGORY
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 0 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(0)].idx)]
+      ELSE NULL
+    END) AS SENTENCE1
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 1 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(1)].idx)]
+      ELSE NULL
+    END) AS SENTENCE2
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 2 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(2)].idx)]
+      ELSE NULL
+    END) AS SENTENCE3
+FROM
+  `kb-daas-dev.master_200729.keyword_corona_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  --AND A.CRAWLSTAMP < TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP, 'Asia/Seoul') BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
