@@ -495,7 +495,7 @@ WHERE
 ]
 
 INSERT INTO `kb-daas-dev.mart_200729.aggregation_daily` (
-  TYPE, CHANNEL, S_NAME, WRITE_DAY, CNT_DOC, CNT_RESULT_DOC, CNT_RESULT_KEYWORD
+  TYPE, CHANNEL, S_NAME, WRITE_DAY, CNT_DOC, CNT_RESULT_DOC, CNT_RESULT_KEYWORD, CNT_RESULT_UNIQUE_KEYWORD
 ) 
 
 SELECT
@@ -506,6 +506,7 @@ SELECT
   , B.doc_cnt
   , A.cnt_result_doc
   , A.cnt_result_keyword
+  , A.cnt_result_unique_keyword
 FROM (
 SELECT
   A.CHANNEL AS CHANNEL
@@ -513,6 +514,7 @@ SELECT
   , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
   , count(distinct DOCID) as CNT_RESULT_DOC
   , count(K.keyword) as CNT_RESULT_KEYWORD
+  , count(distinct K.keyword) as CNT_RESULT_UNIQUE_KEYWORD
 FROM
   `kb-daas-dev.master_200729.keyword_bank_result` A
 CROSS JOIN
@@ -527,6 +529,8 @@ GROUP BY
 SELECT 
    count(*) as doc_cnt
   , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , channel
+  , s_name
 FROM
   `kb-daas-dev.master_200729.keyword_bank_result` A
 WHERE
@@ -676,7 +680,7 @@ WHERE
 ]
 
 
-INSERT INTO `kb-daas-dev.mart_200729.aggregation_daily_2` (
+INSERT INTO `kb-daas-dev.mart_200729.aggregation_daily_3` (
   TYPE, CHANNEL, WRITE_DAY, CNT_DOC, CNT_RESULT_DOC, CNT_RESULT_KEYWORD, CNT_RESULT_UNIQUE_KEYWORD
 ) 
 SELECT
@@ -716,3 +720,199 @@ GROUP BY
 ) B
 WHERE
    A.day = B.day 
+
+
+
+
+-- AGGREGATION_CATEGORY_DAILY_2
+-- Partition : X
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Category",
+    "mode": "REQUIRED",
+    "name": "CATEGORY",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_KEYWORD",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Unique Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_UNIQUE_KEYWORD",
+    "type": "INTEGER"
+  }
+]
+
+INSERT INTO `kb-daas-dev.mart_200729.aggregation_category_daily_2` (
+  TYPE, CHANNEL, CATEGORY, WRITE_DAY, CNT_DOC, CNT_RESULT_DOC, CNT_RESULT_KEYWORD, CNT_RESULT_UNIQUE_KEYWORD
+) 
+SELECT
+  1 as type
+  , A.channel
+  , A.category
+  , A.day
+  , B.doc_cnt
+  , A.cnt_result_doc
+  , A.cnt_result_keyword
+  , A.CNT_RESULT_UNIQUE_KEYWORD
+FROM (
+SELECT
+  A.CHANNEL AS CHANNEL
+  , A.D2C[SAFE_OFFSET(0)].label AS category
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , count(distinct DOCID) as CNT_RESULT_DOC
+  , count(K.keyword) as CNT_RESULT_KEYWORD
+  , count(distinct K.keyword) as CNT_RESULT_UNIQUE_KEYWORD
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
+GROUP BY
+  channel, category, day
+) A, (
+SELECT 
+   count(*) as doc_cnt
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , A.channel
+  , A.D2C[SAFE_OFFSET(0)].label AS category
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+GROUP BY
+  channel, category, day
+) B
+WHERE
+   A.day = B.day and A.channel = B.channel and A.category = B.category
+   
+   
+-- AGGREGATION_CATEGORY_DAILY_3
+-- Partition : X
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Category",
+    "mode": "REQUIRED",
+    "name": "CATEGORY",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_KEYWORD",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Unique Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_UNIQUE_KEYWORD",
+    "type": "INTEGER"
+  }
+]
+
+
+INSERT INTO `kb-daas-dev.mart_200729.aggregation_category_daily_3` (
+  TYPE, CATEGORY, WRITE_DAY, CNT_DOC, CNT_RESULT_DOC, CNT_RESULT_KEYWORD, CNT_RESULT_UNIQUE_KEYWORD
+) 
+SELECT
+  1 as type
+  , A.category
+  , A.day
+  , B.doc_cnt
+  , A.cnt_result_doc
+  , A.cnt_result_keyword
+  , A.CNT_RESULT_UNIQUE_KEYWORD
+FROM (
+SELECT
+  A.D2C[SAFE_OFFSET(0)].label AS category
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , count(distinct DOCID) as CNT_RESULT_DOC
+  , count(K.keyword) as CNT_RESULT_KEYWORD
+  , count(distinct K.keyword) as CNT_RESULT_UNIQUE_KEYWORD
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
+GROUP BY
+  category, day
+) A, (
+SELECT 
+   count(*) as doc_cnt
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , A.D2C[SAFE_OFFSET(0)].label AS category
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+GROUP BY
+  category, day
+) B
+WHERE
+   A.day = B.day and A.category = B.category
