@@ -24,3 +24,8 @@ sentiment = client.analyze_sentiment(document=document).document_sentiment
 print('Text: {}'.format(text))
 print('Sentiment: {}, {}'.format(sentiment.score, sentiment.magnitude))
 </PRE>
+
+# Settings API Key 
+```
+export GOOGLE_APPLICATION_CREDENTIALS=/home/tgkang/.key.json 
+```
