@@ -8,7 +8,7 @@ import time
 import googleapiclient.discovery
 
 project_id = 'kb-daas-dev' # your project ID
-dataset_id = 'master_200722' # your dataset ID
+dataset_id = 'master_200729' # your dataset ID
 table_id = 'keyword_bank_nlp' # your table ID
 
 # for Standalone Test
@@ -90,6 +90,9 @@ def call_nlp_api_entities(content):
 # 
 def call_nlp_api_sentiment(content):
 
+    # disable
+    return None
+
     start = time.time()
     try:
        response = analyze_sentiment(content, get_native_encoding_type())
@@ -132,8 +135,11 @@ def convert_formatted_map(row):
                     , "score": s["sentiment"]["score"] 
                 })
 
-    return {
-        'ID' : row['ID']
+    yield {
+        'DOCID' : row['DOCID']
+        , 'CHANNEL' : row['CHANNEL']
+        , 'S_NAME' : row['S_NAME']
+        , 'SB_NAME' : row['SB_NAME']
         , 'CRAWLSTAMP' : row['D_CRAWLSTAMP']
         , 'WRITESTAMP' : row['D_WRITESTAMP']
         , 'ENTITIES' : entities
@@ -178,41 +184,52 @@ def main1():
             beam.io.BigQuerySource(
                 query="""
                     SELECT
-                       ID
+                       DOCID
+                       , CHANNEL
+                       , S_NAME
+                       , SB_NAME
                        , D_CRAWLSTAMP
                        , D_WRITESTAMP
                        , D_CONTENT
                     FROM (
                       SELECT 
-                           A.ID
+                           A.DOCID
+                          , A.CHANNEL
+                          , A.S_NAME
+                          , A.SB_NAME
                           , A.D_CRAWLSTAMP
                           , A.D_WRITESTAMP
                           , A.D_CONTENT 
-                          , B.ID as BID
+                          , B.DOCID as BID
                       FROM 
                           (
                             SELECT 
-                                *
+                                DOCID, CHANNEL, S_NAME, SB_NAME, D_CRAWLSTAMP, D_WRITESTAMP, D_CONTENT
                             FROM 
-                                `kb-daas-dev.master_200722.keyword_bank` 
+                                `kb-daas-dev.master_200729.keyword_bank` 
                             WHERE 
-                                D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-30 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') 
+                                D_CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
+                                AND TIMESTAMP('2020-06-04 00:00:00', 'Asia/Seoul') 
+                                AND D_WRITESTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
+                                AND TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul') 
+                                AND LENGTH(D_CONTENT) < 15000
                           ) A
                           LEFT OUTER JOIN (
                             SELECT 
-                                ID 
+                                DOCID
                             FROM 
-                                `kb-daas-dev.master_200722.keyword_bank_nlp` 
+                                `kb-daas-dev.master_200729.keyword_bank_nlp` 
                             WHERE 
-                                CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-30 00:00:00', 'Asia/Seoul') 
-                                AND TIMESTAMP('2020-07-01 00:00:00', 'Asia/Seoul') 
+                                CRAWLSTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
+                                AND TIMESTAMP('2020-06-04 00:00:00', 'Asia/Seoul') 
+                                AND WRITESTAMP BETWEEN TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
+                                AND TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul') 
                           ) B
-                          ON A.ID = B.ID
+                          ON A.DOCID = B.DOCID
                     ) A
                     WHERE
                       BID is null
-                    LIMIT 100
+                    LIMIT 6000
                 """,
                 project=project_id,
                 use_standard_sql=True)
@@ -224,9 +241,11 @@ def main1():
         #| 'Testing' >> beam.Map(cleasing_contents)
         #| 'Testing 2' >> beam.GroupByKey()
         #| 'Testing 3' >> beam.Map(count_ones)
-        | 'Cleansing' >> beam.Map(lambda row: {'ID':row['ID'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'D_CONTENT':cleasing_contents(row['D_CONTENT'])})
-        | 'Call with KB STA API' >> beam.Map(lambda row: {'ID':row['ID'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'ENTITIES':call_nlp_api_entities(row['D_CONTENT']), 'SENTIMENT':call_nlp_api_sentiment(row['D_CONTENT'])})
-        | 'Trasfrom Result' >> beam.Map(lambda row: convert_formatted_map(row))
+        | 'Cleansing' >> beam.Map(lambda row: {'DOCID':row['DOCID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'],'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'D_CONTENT':cleasing_contents(row['D_CONTENT'])})
+        #| 'Call with Google NLP API' >> beam.Map(lambda row: {'DOCID':row['DOCID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'ENTITIES':call_nlp_api_entities(row['D_CONTENT']), 'SENTIMENT':call_nlp_api_sentiment(row['D_CONTENT'])})
+        # Disable sentiment
+        | 'Call with Google NLP API' >> beam.Map(lambda row: {'DOCID':row['DOCID'], 'CHANNEL':row['CHANNEL'], 'S_NAME':row['S_NAME'], 'SB_NAME':row['SB_NAME'], 'D_CRAWLSTAMP':row['D_CRAWLSTAMP'], 'D_WRITESTAMP':row['D_WRITESTAMP'], 'ENTITIES':call_nlp_api_entities(row['D_CONTENT']), 'SENTIMENT': call_nlp_api_sentiment(row['D_CONTENT'])})
+        | 'Trasfrom Result' >> beam.ParDo(convert_formatted_map)
     )
 
     (

@@ -29,6 +29,31 @@ class DefaultResponse:
     proc_time = 0
     err_msg = ''
 
+def clean_text(text):
+    pattern = '([a-zA-Z0-9_.+-\\\*]+@[\\\*a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)'
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("E-mail제거 : " , text , "\n")
+    pattern = '(http|ftp|https)://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("URL 제거 : ", text , "\n")
+    pattern = '([ㄱ-ㅎㅏ-ㅣ]+)'
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("한글 자음 모음 제거 : ", text , "\n")
+    pattern = '<[^>]*>'
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("태그 제거 : " , text , "\n")
+    pattern = r'\([^)]*\)'
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("괄호와 괄호안 글자 제거 :  " , text , "\n")
+    pattern = '[^\w\s]'
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("특수기호 제거 : ", text , "\n" )
+    text = text.strip()
+    #print("양 끝 공백 제거 : ", text , "\n" )
+    text = " ".join(text.split())
+    #print("중간에 공백은 1개만 : ", text )
+    return text
+
 # 불필요한 특수문자 제거 전처리 함수
 def cleasing_contents(contents):
     remove_target_char = ["&", "="] # 본문에서 제거해야할 특수문자
@@ -53,7 +78,7 @@ def call_kbsta_api(content):
     url = "http://35.241.3.78:8080/analyze"
     querystring = {"tasks":"d2c,kpe,kse,bnlp,ner"}
     #body = "text=" + content
-    body = "text=" + re.sub('[_=#/?:$}&^·\xa0]', '', content)
+    body = "text=" + re.sub('[_=#/?:$}&^·\xa0]', '', clean_text(content))
     body = body.encode(encoding='utf-8')
     headers = {
         'apikey': "5rbeC7bMzbynvbcNqGwOnp5Tll2PUB9B",
@@ -64,7 +89,7 @@ def call_kbsta_api(content):
     start = time.time()
 
     try:
-        response = requests.request("POST", url, data=body, headers=headers, params=querystring)
+        response = requests.request("POST", url, data=body, headers=headers, params=querystring, timeout=(30,30))
         response.proc_time = time.time() - start
         response.err_msg = ''
    
@@ -82,6 +107,7 @@ def call_kbsta_api(content):
 
 def call_kbsta_api_with_json(docid, content):
     # JSON 디코딩
+    #print("DOCID : ", docid)
     try:
         response = call_kbsta_api(content)
 
@@ -94,6 +120,7 @@ def call_kbsta_api_with_json(docid, content):
         
         return json_array
     except Exception as e:
+        print("Exception : ", response.text)
         logging.warning("call_kbsta_api Error docid {} {}".format(docid, e))
         json_array = {}
         json_array["response"] = { "status_code" : 900 , "proc_time" : 0, "err_msg" : str(e) }
@@ -181,10 +208,7 @@ def main(argv):
     # for test
     pipeline = beam.Pipeline(options=options)
 
-    raw_data = (pipeline
-        | 'Read Data From BigQuery' >> beam.io.Read(
-            beam.io.BigQuerySource(
-                query=f"""
+    query=f"""
 SELECT 
     A.DOCID
     , A.CHANNEL
@@ -212,7 +236,11 @@ FROM (
         , SB_NAME
         , D_CRAWLSTAMP
         , D_WRITESTAMP
-        , D_CONTENT 
+        , 
+         (CASE
+            WHEN CHANNEL = '뉴스' THEN D_CONTENT
+            ELSE SUBSTR(D_CONTENT, 1, 500)
+          END) AS D_CONTENT
     FROM 
         `{dataset}.{table}` 
     WHERE 
@@ -234,7 +262,34 @@ FROM (
 WHERE
   A.BID IS NULL
 LIMIT 300
-                """,
+                """
+
+    query1=f"""
+    SELECT 
+        DOCID
+        , CHANNEL
+        , S_NAME
+        , SB_NAME
+        , D_CRAWLSTAMP
+        , D_WRITESTAMP
+        , 
+         (CASE
+            WHEN CHANNEL = '뉴스' THEN D_CONTENT
+            ELSE SUBSTR(D_CONTENT, 1, 500)
+          END) AS D_CONTENT
+    FROM 
+        `{dataset}.{table}` 
+    WHERE 
+        D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul') 
+        AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} {hour}:00:00', 'Asia/Seoul'), INTERVAL 1 HOUR)
+        AND DOCID=7447021172
+        AND LENGTH(D_CONTENT) < 15000
+    """
+
+    raw_data = (pipeline
+        | 'Read Data From BigQuery' >> beam.io.Read(
+            beam.io.BigQuerySource(
+                query=query,
                 project=project_id,
                 use_standard_sql=True)
         )

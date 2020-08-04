@@ -2,11 +2,11 @@
 
 echo "START `date`"
 
-for ((j=1;j<=100;j++))
+for ((j=1;j<=2;j++))
 do
     #for i in 17 18 19 20 21 22 23 24 25 26 27 28 29 30 16
     #for i in 23 24 25 26 27 28 29 30
-    for i in 17 18 19 20 21 22 
+    for i in 18 23 24 25 29 30 16 17 22
     do 
        echo "START ${j}-${i} : " `date`
        python call_to_kb_sta_api_corona.py "${i}" "00" &
@@ -18,8 +18,8 @@ do
        python call_to_kb_sta_api_corona.py "${i}" "06" &
        python call_to_kb_sta_api_corona.py "${i}" "07" &
        python call_to_kb_sta_api_corona.py "${i}" "08" &
-       #python call_to_kb_sta_api_corona.py "${i}" "09" &
-       python call_to_kb_sta_api_corona.py "${i}" "10" &
+       python call_to_kb_sta_api_corona.py "${i}" "09" &
+       #python call_to_kb_sta_api_corona.py "${i}" "10" &
        python call_to_kb_sta_api_corona.py "${i}" "11" &
        python call_to_kb_sta_api_corona.py "${i}" "12" &
        python call_to_kb_sta_api_corona.py "${i}" "13" &
@@ -33,7 +33,7 @@ do
        python call_to_kb_sta_api_corona.py "${i}" "21" &
        python call_to_kb_sta_api_corona.py "${i}" "22" &
        python call_to_kb_sta_api_corona.py "${i}" "23" &
-       python call_to_kb_sta_api_corona.py "${i}" "09" 
+       python call_to_kb_sta_api_corona.py "${i}" "10" 
        echo "END ${j}-${i} : " `date`
     done
 done

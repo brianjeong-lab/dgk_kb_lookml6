@@ -29,6 +29,32 @@ class DefaultResponse:
     proc_time = 0
     err_msg = ''
 
+def clean_text(text):
+    pattern = '([a-zA-Z0-9_.+-\\\*]+@[\\\*a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)' 
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("E-mail제거 : " , text , "\n")
+    pattern = '(http|ftp|https)://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("URL 제거 : ", text , "\n")
+    pattern = '([ㄱ-ㅎㅏ-ㅣ]+)'  
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("한글 자음 모음 제거 : ", text , "\n")
+    pattern = '<[^>]*>'        
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("태그 제거 : " , text , "\n")
+    pattern = r'\([^)]*\)'
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("괄호와 괄호안 글자 제거 :  " , text , "\n")
+    pattern = '[^\w\s]'   
+    text = re.sub(pattern=pattern, repl='', string=text)
+    #print("특수기호 제거 : ", text , "\n" )
+    text = text.strip()
+    #print("양 끝 공백 제거 : ", text , "\n" )
+    text = " ".join(text.split())
+    #print("중간에 공백은 1개만 : ", text )
+    return text   
+
+
 # 불필요한 특수문자 제거 전처리 함수
 def cleasing_contents(contents):
     remove_target_char = ["&", "="] # 본문에서 제거해야할 특수문자
@@ -53,7 +79,7 @@ def call_kbsta_api(content):
     url = "http://35.241.3.78:8080/analyze"
     querystring = {"tasks":"d2c,kpe,kse,bnlp,ner"}
     #body = "text=" + re.sub(r'[\xa0]', '', content)
-    body = "text=" + re.sub('[_=#/?:$}&^·\xa0]', '', content)
+    body = "text=" + re.sub('[_=#/?:$}&^·\xa0]', '', clean_text(content))
     #body = "text=" + content
     #print("body", body)
     #print(content[1111], content[1112])
@@ -205,7 +231,7 @@ FROM (
       , A.SB_NAME
       , A.D_CRAWLSTAMP
       , A.D_WRITESTAMP
-      , A.D_CONTENT 
+      , A.D_CONTENT
       , B.DOCID AS BID
   FROM
   (
@@ -216,13 +242,16 @@ FROM (
         , SB_NAME
         , D_CRAWLSTAMP
         , D_WRITESTAMP
-        , D_CONTENT 
+        , (CASE 
+            WHEN CHANNEL = '뉴스' THEN D_CONTENT 
+            ELSE SUBSTR(D_CONTENT, 1, 500)
+           END) AS D_CONTENT
     FROM 
         `{dataset}.{table}` 
     WHERE 
         D_CRAWLSTAMP BETWEEN TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul') 
         AND TIMESTAMP_ADD(TIMESTAMP('{year}-{month}-{day} 00:00:00', 'Asia/Seoul'), INTERVAL 1 DAY)
-        AND LENGTH(D_CONTENT) < 15000
+        --AND LENGTH(D_CONTENT) < 15000
   ) A 
   LEFT OUTER JOIN (
       SELECT 
@@ -238,7 +267,7 @@ FROM (
 WHERE
   A.BID IS NULL
   -- AND LENGTH(A.D_CONTENT) != 100000
-LIMIT 100
+LIMIT 500
                 """
 
     raw_data = (pipeline

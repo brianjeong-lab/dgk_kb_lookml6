@@ -2,10 +2,11 @@
 
 echo "START `date`"
 
-for ((j=1;j<=100;j++))
+for ((j=1;j<=1;j++))
 do
     #for i in 17 18 19 20 21 22 23 24 25 26 27 28 29 30 16
-    for i in 23 24 25 26 27 28 29 30
+    #for i in 23 24 25 26 27 28 29 30
+    for i in 27 28 29 30 23 24 25 26
     do 
        echo "START ${j}-${i} : " `date`
        python call_to_kb_sta_api_corona.py "${i}" "00" &
