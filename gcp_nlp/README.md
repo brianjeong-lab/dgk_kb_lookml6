@@ -25,7 +25,7 @@ print('Text: {}'.format(text))
 print('Sentiment: {}, {}'.format(sentiment.score, sentiment.magnitude))
 </PRE>
 
-# 인증하기
+# Settings API Key 
 ```
-$ gcloud auth login
+export GOOGLE_APPLICATION_CREDENTIALS=/home/tgkang/.key.json 
 ```
