@@ -916,3 +916,80 @@ GROUP BY
 ) B
 WHERE
    A.day = B.day and A.category = B.category
+
+
+-- KEYWORD_NLP
+-- Partition : WRITE_DAY
+-- 
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "Keyword",
+    "mode": "REQUIRED",
+    "name": "KEYWORD",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Count",
+    "mode": "REQUIRED",
+    "name": "CNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Sum of score",
+    "mode": "REQUIRED",
+    "name": "SUM_SCORE",
+    "type": "FLOAT"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_DOC",
+    "type": "INTEGER"
+  }
+]
+
+
+INSERT INTO `kb-daas-dev.mart_200729.keyword_nlp` (
+    TYPE, CHANNEL, S_NAME, KEYWORD, WRITE_DAY, CNT, SUM_SCORE, CNT_DOC
+) 
+SELECT
+  1 AS type
+  , A.CHANNEL AS channel
+  , A.S_NAME as s_name
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , K.keyword as keyword
+  , count(*) as cnt
+  , sum(K.salience) as sum_score
+  , count(distinct ID) as cnt_doc
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_nlp` A
+CROSS JOIN
+  UNNEST(ENTITIES) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-01' AND '2020-06-30'
+GROUP BY channel, s_name, day, keyword
