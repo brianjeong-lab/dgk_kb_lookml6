@@ -130,3 +130,22 @@ SELECT id
 ;
 
 ````
+
+#첫글자가 소문자 영문일 경우 ''로 치환
+````
+select sb_name
+     , case when REGEXP_CONTAINS(sb_name, '[a-z]')  = true then trim(REGEXP_REPLACE(SB_NAME, '[a-z]', ''))
+       else sb_name end replace_name2
+  from master_200729.keyword_bank
+ where date(D_CRAWLSTAMP) > "2020-06-01"
+   and channel = "뉴스"
+ limit 100
+ ````
+ 데이터 확인 후 업데이트 문장 실행
+ 
+ ````
+ UPDATE master_200729.keyword_bank
+   SET sb_name = case when REGEXP_CONTAINS(sb_name, '[a-z]')  = true then trim(REGEXP_REPLACE(SB_NAME, '[a-z]', ''))
+                 else sb_name end
+WHERE TRUE
+ ````
