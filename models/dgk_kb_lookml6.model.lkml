@@ -133,3 +133,37 @@ explore: tree2{
 explore: tree3{
   cancel_grouping_fields: [tree3.search_keyword, tree3.keyword]
 }
+
+explore: total_aggregation_document{}
+
+explore: result_keyword_total {}
+
+explore: unique_keyword_total {}
+
+explore: groupbychannel_resultdoc {}
+
+explore: groupbychannel_resultkeyword {}
+
+explore: groupbychannel_uniquekeyword {}
+
+explore: groupbycategory_resultdoc {}
+
+explore: groupbycategory_resultkeyword {}
+
+explore: groupbycategory_uniquekeyword {}
+
+explore: aggregation_daily_2 {}
+
+explore: aggregation_category_2 {}
+
+explore: keyword_top100 {}
+
+explore: top50_news_channel {}
+
+explore: top50_except_news {}
+
+explore: groupbycategory_trend_doc {}
+
+explore: groupbycategory_trend_keyword {}
+
+explore: groupbycategory_trend_uniquek {}
