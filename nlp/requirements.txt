@@ -1,0 +1,3 @@
+google-cloud-language
+google-api-python-client
+google-apitools

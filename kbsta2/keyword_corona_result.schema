@@ -1,0 +1,132 @@
+[
+  {
+    "description": "Document ID",
+    "mode": "REQUIRED",
+    "name": "DOCID",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel Info",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "SB Name",
+    "mode": "REQUIRED",
+    "name": "SB_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "Crawler Time",
+    "mode": "REQUIRED",
+    "name": "CRAWLSTAMP",
+    "type": "TIMESTAMP"
+  },
+  {
+    "description": "Source Wrote Time",
+    "mode": "REQUIRED",
+    "name": "WRITESTAMP",
+    "type": "TIMESTAMP"
+  },
+  {
+    "description": "Sentences",
+    "mode": "REPEATED",
+    "name": "SS",
+    "type": "STRING"
+  },
+  {
+    "description": "Document to Categorization",
+    "mode": "REPEATED",
+    "name": "D2C",
+    "type": "RECORD",
+    "fields": [
+            {
+                "name": "label",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "score",
+                "type": "FLOAT",
+                "mode": "REQUIRED"
+            }
+    ]
+  },
+  {
+    "description": "Keyword ...",
+    "mode": "REPEATED",
+    "name": "KPE",
+    "type": "RECORD",
+    "fields": [
+            {
+                "name": "keyword",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "category",
+                "type": "STRING",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "score",
+                "type": "FLOAT",
+                "mode": "REQUIRED"
+            }
+    ]
+  },
+  {
+    "description": "Key Sentens Extration",
+    "mode": "REPEATED",
+    "name": "KSE",
+    "type": "RECORD",
+    "fields": [
+            {
+                "name": "idx",
+                "type": "INTEGER",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "score",
+                "type": "FLOAT",
+                "mode": "REQUIRED"
+            }
+    ]
+  },
+  {
+    "description": "Response from KB STA",
+    "mode": "NULLABLE",
+    "name": "RESPONSE",
+    "type": "RECORD",
+    "fields": [
+            {
+                "name": "status_code",
+                "type": "INTEGER",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "proc_time",
+                "type": "FLOAT",
+                "mode": "REQUIRED"
+            },
+            {
+                "name": "err_msg",
+                "type": "STRING",
+                "mode": "NULLABLE"
+            }
+    ]
+  },
+  {
+    "description": "Processing Time",
+    "mode": "REQUIRED",
+    "name": "PROCSTAMP",
+    "type": "TIMESTAMP"
+  }
+]

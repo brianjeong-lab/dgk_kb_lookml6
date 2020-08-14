@@ -1,0 +1,104 @@
+[
+  {
+    "description": "시스템 문서 seq",
+    "mode": "REQUIRED",
+    "name": "ID",
+    "type": "INTEGER"
+  },
+  {
+    "description": "수집 문서 seq",
+    "mode": "REQUIRED",
+    "name": "DOCID",
+    "type": "INTEGER"
+  },
+  {
+    "description": "수집 채널",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "사이트번호",
+    "mode": "REQUIRED",
+    "name": "S_SEQ",
+    "type": "INTEGER"
+  },
+  {
+    "description": "사이트명",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "게시판명",
+    "mode": "REQUIRED",
+    "name": "SB_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "수집일시(timestamp)",
+    "mode": "REQUIRED",
+    "name": "D_CRAWLSTAMP",
+    "type": "TIMESTAMP"
+  },
+  {
+    "description": "제목",
+    "mode": "REQUIRED",
+    "name": "D_TITLE",
+    "type": "STRING"
+  },
+  {
+    "description": "링크",
+    "mode": "REQUIRED",
+    "name": "D_URL",
+    "type": "STRING"
+  },
+  {
+    "description": "본문",
+    "mode": "NULLABLE",
+    "name": "D_CONTENT",
+    "type": "STRING"
+  },
+  {
+    "description": "작성자",
+    "mode": "NULLABLE",
+    "name": "D_WRITER",
+    "type": "STRING"
+  },
+  {
+    "description": "작성일시(timestamp)",
+    "mode": "NULLABLE",
+    "name": "D_WRITESTAMP",
+    "type": "TIMESTAMP"
+  },
+  {
+    "description": "조회수",
+    "mode": "NULLABLE",
+    "name": "VIEW_COUNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "댓글수",
+    "mode": "NULLABLE",
+    "name": "REPLY_COUNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "좋아요수",
+    "mode": "NULLABLE",
+    "name": "GOOD_COUNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "싫어요수",
+    "mode": "NULLABLE",
+    "name": "BAD_COUNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "기타부가정보 (type:JSON)",
+    "mode": "NULLABLE",
+    "name": "JSON_DATA",
+    "type": "STRING"
+  }
+]
