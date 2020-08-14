@@ -6,7 +6,7 @@ view: top50_news_channel {
       and type = 1
       and channel = '뉴스'
       group by keyword
-      order by Total desc limit 50
+      order by Total desc limit 30
        ;;
   }
 
