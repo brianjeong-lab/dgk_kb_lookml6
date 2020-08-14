@@ -4,7 +4,7 @@ view: top50_news_channel {
       FROM `kb-daas-dev.mart_200729.category_keyword_daily_top_100`
       where write_day between 20200601 and 20200630
       and type = 1
-      and channel = '뉴스'
+      and channel = '뉴스' and category != '야구'
       group by keyword
       order by Total desc limit 30
        ;;
