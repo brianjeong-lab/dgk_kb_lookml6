@@ -133,3 +133,118 @@ INSERT INTO `mart_200729.filter` (type, keyword) values
  ('1', '게시자' ),
  ('1', '마찬가지' ),
  ('1', '담당자' );
+
+
+
+
+--  INSERT INTO `mart_200729.filter` (type, keyword) values 
+--    ('1', '합격생');
+--   ('1', '코스피코스닥'),
+--   ('1', '모스트콘텐츠동아닷컴'),
+--   ('1', '20200602'),
+--   ('1', '게임매니아PC방경북'),
+--   ('1', '인천주안동삼영아파트'),
+--   ('1', '바디플레이스경기도'),
+--   ('1', '압구정비만클리닉'),
+--   ('1', 'M크린탑안면부'),
+--   ('1', '디비케이디스플레이텍'),
+--   ('1', '추천인코드F2NMH'),
+--   ('1', '착한선결제대'),
+--   ('1', '와이지원하이스드릴'),
+--   ('1', '김홍일김홍업'),
+--   ('1', '박시현근육학연구소'),
+--   ('1', 'KB최팀장35서울남'),
+--   ('1', '간호조무사월급만원'),
+--   ('1', '안성기유준상'),
+--   ('1', '현대백화점패셔니스타'),
+--   ('1', 'httpswww'),
+--   ('1', '월성동계류유산한의원');
+
+
+
+-- DELETE FROM `kb-daas-dev.mart_200729.keyword_bank_result_agg_only_bank`
+-- WHERE
+--   CRAWLSTAMP > TIMESTAMP_SUB(TIMESTAMP '2020-06-01', INTERVAL 1 DAY)
+--   AND DOCID IN (
+--     SELECT A.DOCID FROM 
+--       (
+--       SELECT DOCID, KPE FROM `kb-daas-dev.mart_200729.keyword_bank_result_agg_only_bank` A, UNNEST(A.KPE) K
+--       WHERE
+--          A.CRAWLSTAMP > TIMESTAMP_SUB(TIMESTAMP '2020-06-01', INTERVAL 1 DAY)
+--          AND K.keyword = '한섬한섬팩토리아울렛한섬아울렛타임마인미샤듀엘'
+--       ) A, 
+--       (SELECT DOCID, KPE FROM `kb-daas-dev.mart_200729.keyword_bank_result_agg_only_bank` A, UNNEST(A.KPE) K
+--       WHERE
+--          A.CRAWLSTAMP > TIMESTAMP_SUB(TIMESTAMP '2020-06-01', INTERVAL 1 DAY)
+--          AND K.keyword = '사이즈미스'
+--       ) B
+--     WHERE
+--       A.DOCID = B.DOCID
+--   )
+
+-- INSERT INTO `mart_200729.keyword_bank_result_agg_remove_docid` (docid)
+--     SELECT A.DOCID FROM 
+--       (
+--       SELECT DOCID, KPE FROM `kb-daas-dev.mart_200729.keyword_bank_result_agg_only_bank` A, UNNEST(A.KPE) K
+--       WHERE
+--          A.CRAWLSTAMP > TIMESTAMP_SUB(TIMESTAMP '2020-06-01', INTERVAL 1 DAY)
+--          AND K.keyword = '이숭기발'
+--       ) A, 
+--       (SELECT DOCID, KPE FROM `kb-daas-dev.mart_200729.keyword_bank_result_agg_only_bank` A, UNNEST(A.KPE) K
+--       WHERE
+--          A.CRAWLSTAMP > TIMESTAMP_SUB(TIMESTAMP '2020-06-01', INTERVAL 1 DAY)
+--          AND K.keyword = '리워드'
+--       ) B
+--     WHERE
+--       A.DOCID = B.DOCID
+
+-- SELECT TITLE, count(*) AS CNT from `kb-daas-dev.mart_200729.keyword_bank_result_agg_only_bank`
+-- WHERE CRAWLSTAMP > TIMESTAMP_SUB(TIMESTAMP '2020-06-01', INTERVAL 1 DAY)
+-- GROUP BY TITLE ORDER BY CNT DESC
+
+INSERT INTO `mart_200729.keyword_bank_result_agg_remove_docid` (docid)
+SELECT DOCID from `mart_200729.keyword_bank_result_agg_only_bank`
+WHERE
+  CRAWLSTAMP > TIMESTAMP_SUB(TIMESTAMP '2020-06-01', INTERVAL 1 DAY)
+  AND
+  TITLE in (
+  "스타벅스 텀블러쿠폰 별쿠폰 음료쿠폰 보고쿠폰 BOGO 쿠폰 텀쿠 팝니다"
+  ,"CGV <아이즈온미> 4dx, ScreenX 특별관 1명 정가에서 -4천원 할인가에 예매, 일반관은 1명 정가에서 -3천원 할인가에 예매 (1인이상 다수가능, 주말가능)"
+  ,"[판매중] 도미노피자쿠폰/ 롯데리아 모바일금액권/ BBQ,BHC치킨,굽네치킨/ 이디야커피/ 피자마루/ 맥도날드/ 명랑핫도그 팔아요"
+  ,"bhc뿌링클 치즈볼 콜라1.25"
+  ,"KB카드 업무지원센터 ★축하금 40만) 국민은행 헬프데스크 교육 모집_아이비커리어"
+  ,"메가박스 대리예매 (2D 일반 7,000원, 특별관 MX & 더부티크 10,000원) 선예매, 후입금"
+  ,"상승 마감한 코스피"
+  ,"혹시 만원정도빌려주실분 계실까요??..밥한끼먹고싶어서요"
+  ,"수완지구 네일 / 광주 네일 / 아미네일"
+  ,"남자냉감티 4800원 여티셔츠2500원 땡처리"
+  ,"장안동 NO.1 컴퓨터자수입니다#컴퓨터자수#보풀자수#와펜자수#전판자수#아플리케자수#엠보자수#컴퓨터자수의 모든것#컴퓨터자수의 ACE."
+  ,"등산/ 트레킹화 직거래 장터 알뜰 정보"
+  ,"BHC 후라이드치킨+치즈볼+콜라1.25L"
+  ,"▶▶ 수능특강 '영어'&'영독' 내신대비 통합 학습점검 자료 ◀◀"
+  ,"닌텐도 스위치 라이트 옐로 동물의 숲 팝니다"
+  ,"[공동구매] 중외제약 피톤케어 고급 차량용 방향제"
+  ,"[판매중] 도미노피자쿠폰/ 롯데리아 모바일금액권/ BBQ,BHC치킨,굽네치킨/ 이디야/ 피자마루/ 맥도날드 팔아요"
+  ,"배스킨라빈스(20%), 뚜레쥬르(20%), 할리스(21%), 에스오일주유권"
+  ,"㈜무궁화, 동두천시자원봉사센터 이동세탁차량 세제지원 협약"
+  ,"장안동 NO.1 컴퓨터자수입니다#컴퓨터자수#보풀자수#와펜자수#전판자수#아플리케자수#마크자수#컴퓨터자수의 모든것#컴퓨터자수의 ACE."
+  ,"▶▶▶▶노량진역 6번출구 남성전용 프라임고시텔 18만원부터 ~31만원까지"
+  ,"아마존(www.amazon.com)에서 직구한 무릎 지지대와 찜질팩 팝니다"
+  ,"스마트폰 액정보호 풀커버/강화유리필름, 가정용/차량용 고속,급속충전기/USB충전케이블"
+  ,"<자소설메이트>[부산]자소서, 나의 매력을 품다! 원데이 자소서클래스 부산대 5기(~6,25) / 경성대 6기(~7.3) 동시모집");
+
+
+--     SELECT A.DOCID, A.KPE FROM 
+--       (
+--       SELECT DOCID, KPE FROM `kb-daas-dev.mart_200729.keyword_bank_result_agg_only_bank` A, UNNEST(A.KPE) K
+--       WHERE
+--          A.CRAWLSTAMP > TIMESTAMP_SUB(TIMESTAMP '2020-06-01', INTERVAL 1 DAY)
+--          AND K.keyword = '아래링크'
+--       ) A, 
+--       (SELECT DOCID, KPE FROM `kb-daas-dev.mart_200729.keyword_bank_result_agg_only_bank` A, UNNEST(A.KPE) K
+--       WHERE
+--          A.CRAWLSTAMP > TIMESTAMP_SUB(TIMESTAMP '2020-06-01', INTERVAL 1 DAY)
+--          AND K.keyword = '리워드'
+--       ) B
+--      WHERE
+--        A.DOCID = B.DOCID
