@@ -1,0 +1,128 @@
+-- keyword_rank_daily
+[
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword",
+    "mode": "REQUIRED",
+    "name": "KEYWORD",
+    "type": "STRING"
+  },
+  {
+    "description": "The document count",
+    "mode": "REQUIRED",
+    "name": "CNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The score of keyword",
+    "mode": "REQUIRED",
+    "name": "SCORE",
+    "type": "FLOAT"
+  },
+  {
+    "description": "The rank of keyword",
+    "mode": "REQUIRED",
+    "name": "RANK",
+    "type": "INTEGER"
+  }
+]
+
+INSERT INTO `mart_200729.keyword_rank_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE, RANK) 
+SELECT
+  WRITE_DAY
+  , 1
+  , KEYWORD
+  , CNT
+  , SCORE
+  , RANK
+  --, ROW_NUM
+FROM (
+  SELECT
+    RANK() OVER (PARTITION BY WRITE_DAY ORDER BY CNT DESC) AS rank
+    --, ROW_NUMBER() OVER (PARTITION BY WRITE_DAY ORDER BY CNT DESC) AS row_num
+    , WRITE_DAY
+    , CHANNEL
+    , KEYWORD
+    , CNT
+    , SCORE
+  FROM (
+    SELECT
+      WRITE_DAY
+      , CHANNEL
+      , KEYWORD
+      , SUM(CNT) AS CNT
+      , SUM(SUM_SCORE) AS SCORE
+    FROM
+      `kb-daas-dev.mart_200729.keyword`
+    WHERE
+      WRITE_DAY BETWEEN 20200601 AND 20200630
+      AND TYPE = 1
+    GROUP BY
+      WRITE_DAY
+      , CHANNEL
+      , KEYWORD
+  )
+)
+WHERE
+  CNT != 1
+
+
+-- keyword_newly_daily
+[
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword",
+    "mode": "REQUIRED",
+    "name": "KEYWORD",
+    "type": "STRING"
+  },
+  {
+    "description": "The document count",
+    "mode": "REQUIRED",
+    "name": "CNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The score of keyword",
+    "mode": "REQUIRED",
+    "name": "SCORE",
+    "type": "FLOAT"
+  }
+]
+
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) 
+SELECT
+  KEYWORD
+FROM
+  `mart_200729.keyword_newly_daily`
+WHERE
+  WRITE_DAY = 20200602
+MINUS
+  SELECT
+    KEYWORD
+  FROM
+    `mart_200729.keyword_newly_daily`
+  WHERE
+    WRITE_DAY = 20200601
