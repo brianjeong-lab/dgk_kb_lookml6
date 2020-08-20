@@ -114,15 +114,16 @@ WHERE
 
 INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) 
 SELECT
-  KEYWORD
+  WRITE_DAY, 1, KEYWORD, CNT, SCORE
 FROM
   `mart_200729.keyword_newly_daily`
 WHERE
   WRITE_DAY = 20200602
-MINUS
-  SELECT
-    KEYWORD
-  FROM
-    `mart_200729.keyword_newly_daily`
-  WHERE
-    WRITE_DAY = 20200601
+  AND KEYWORD NOT IN (
+    SELECT
+      KEYWORD
+    FROM
+      `mart_200729.keyword_newly_daily`
+    WHERE
+      WRITE_DAY = 20200601
+  )
