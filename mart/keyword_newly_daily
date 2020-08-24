@@ -58,16 +58,17 @@ FROM (
     , SCORE
   FROM (
     SELECT
-      WRITE_DAY
+      CAST(FORMAT_DATE('%Y%m%d', DATE(WRITESTAMP, 'Asia/Seoul')) as INT64) as WRITE_DAY
       , CHANNEL
-      , KEYWORD
-      , SUM(CNT) AS CNT
-      , SUM(SUM_SCORE) AS SCORE
+      , K.KEYWORD
+      , count(K.keyword) AS CNT
+      , SUM(K.SCORE) AS SCORE
     FROM
-      `kb-daas-dev.mart_200729.keyword`
+      `kb-daas-dev.mart_200729.keyword_bank_result_agg` A, UNNEST(KPE) K
     WHERE
-      WRITE_DAY BETWEEN 20200601 AND 20200630
-      AND TYPE = 1
+      DATE(WRITESTAMP, 'Asia/Seoul') BETWEEN "2020-06-1" and "2020-06-30"
+      AND A.docid not in (SELECT docid FROM `mart_200729.keyword_bank_result_agg_remove_docid`)
+      AND K.keyword not in (SELECT keyword FROM `mart_200729.filter`)
     GROUP BY
       WRITE_DAY
       , CHANNEL
@@ -116,14 +117,54 @@ INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SC
 SELECT
   WRITE_DAY, 1, KEYWORD, CNT, SCORE
 FROM
-  `mart_200729.keyword_newly_daily`
+  `mart_200729.keyword_rank_daily`
 WHERE
   WRITE_DAY = 20200602
   AND KEYWORD NOT IN (
     SELECT
       KEYWORD
     FROM
-      `mart_200729.keyword_newly_daily`
+      `mart_200729.keyword_rank_daily`
     WHERE
       WRITE_DAY = 20200601
   )
+  
+  
+  
+-- 한번에 입력
+
+DELETE FROM `mart_200729.keyword_newly_daily` WHERE type = 1;
+
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200602  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200601  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200603  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200602  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200604  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200603  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200605  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200604  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200606  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200605  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200607  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200606  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200608  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200607  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200609  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200608  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200610  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200609  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200611  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200610  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200612  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200611  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200613  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200612  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200614  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200613  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200615  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200614  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200616  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200615  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200617  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200616  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200618  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200617  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200619  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200618  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200620  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200619  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200621  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200620  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200622  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200621  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200623  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200622  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200624  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200623  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200625  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200624  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200626  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200625  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200627  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200626  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200628  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200627  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200629  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200628  );
+INSERT INTO `mart_200729.keyword_newly_daily` (WRITE_DAY, TYPE, KEYWORD, CNT, SCORE) SELECT  WRITE_DAY, 1, KEYWORD, CNT, SCORE FROM  `mart_200729.keyword_rank_daily` WHERE  WRITE_DAY = 20200630  AND KEYWORD NOT IN (    SELECT      KEYWORD    FROM      `mart_200729.keyword_rank_daily`    WHERE      WRITE_DAY = 20200629  );
+
+
+
+SELECT write_day, sum(cnt) from `mart_200729.keyword_newly_daily` group by write_day;
