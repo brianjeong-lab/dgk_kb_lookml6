@@ -52,14 +52,12 @@ FROM (
     RANK() OVER (PARTITION BY WRITE_DAY ORDER BY CNT DESC) AS rank
     --, ROW_NUMBER() OVER (PARTITION BY WRITE_DAY ORDER BY CNT DESC) AS row_num
     , WRITE_DAY
-    , CHANNEL
     , KEYWORD
     , CNT
     , SCORE
   FROM (
     SELECT
       CAST(FORMAT_DATE('%Y%m%d', DATE(WRITESTAMP, 'Asia/Seoul')) as INT64) as WRITE_DAY
-      , CHANNEL
       , K.KEYWORD
       , count(K.keyword) AS CNT
       , SUM(K.SCORE) AS SCORE
@@ -69,9 +67,9 @@ FROM (
       DATE(WRITESTAMP, 'Asia/Seoul') BETWEEN "2020-06-1" and "2020-06-30"
       AND A.docid not in (SELECT docid FROM `mart_200729.keyword_bank_result_agg_remove_docid`)
       AND K.keyword not in (SELECT keyword FROM `mart_200729.filter`)
+      AND A.D2C[SAFE_OFFSET(0)].label != '야구'
     GROUP BY
       WRITE_DAY
-      , CHANNEL
       , KEYWORD
   )
 )
