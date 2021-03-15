@@ -1,0 +1,47 @@
+#문서별 접근을 위한
+# Partition : WRITESTAMP
+# Cluster : ID
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "ID",
+    "mode": "REQUIRED",
+    "name": "ID",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "SB Name",
+    "mode": "NULLABLE",
+    "name": "SB_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "The write timestamp",
+    "mode": "REQUIRED",
+    "name": "WRITESTAMP",
+    "type": "TIMESTAMP"
+  },
+  {
+    "description": "Keyword",
+    "mode": "REQUIRED",
+    "name": "KEYWORD",
+    "type": "STRING"
+  }
+]

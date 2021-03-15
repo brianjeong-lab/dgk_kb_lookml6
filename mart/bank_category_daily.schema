@@ -1,0 +1,38 @@
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Category",
+    "mode": "REQUIRED",
+    "name": "CATEGORY",
+    "type": "STRING"
+  },
+  {
+    "description": "Keyword",
+    "mode": "REQUIRED",
+    "name": "KEYWORD",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Count",
+    "mode": "REQUIRED",
+    "name": "CNT",
+    "type": "INTEGER"
+  }
+]

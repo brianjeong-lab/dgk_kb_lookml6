@@ -1,0 +1,995 @@
+
+-- KEYWORD
+-- Partition : WRITE_DAY
+-- CLUSTER : KEYWORD
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "Keyword",
+    "mode": "REQUIRED",
+    "name": "KEYWORD",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Count",
+    "mode": "REQUIRED",
+    "name": "CNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Sum of score",
+    "mode": "REQUIRED",
+    "name": "SUM_SCORE",
+    "type": "FLOAT"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_DOC",
+    "type": "INTEGER"
+  }
+]
+
+INSERT INTO `kb-daas-dev.mart_200729.keyword` (
+    TYPE, CHANNEL, S_NAME, WRITE_DAY, KEYWORD, CNT, SUM_SCORE, CNT_DOC
+) 
+SELECT
+  1 AS type
+  , A.CHANNEL AS channel
+  , A.S_NAME AS s_name
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , K.keyword as keyword
+  , count(*) as cnt
+  , sum(K.score) as sum_score
+  , count(distinct DOCID) as doc_cnt
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-01' AND '2020-06-30'
+GROUP BY channel, s_name, day, keyword
+
+INSERT INTO `kb-daas-dev.mart_200729.keyword` (
+    TYPE, CHANNEL, S_NAME, WRITE_DAY, KEYWORD, CNT, SUM_SCORE, CNT_DOC
+) 
+SELECT
+  2 AS type
+  , A.CHANNEL AS channel
+  , A.S_NAME AS s_name
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , K.keyword as keyword
+  , count(*) as cnt
+  , sum(K.score) as sum_score
+  , count(distinct DOCID) as doc_cnt
+FROM
+  `kb-daas-dev.master_200729.keyword_corona_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-01' AND '2020-06-30'
+GROUP BY channel, s_name, day, keyword
+
+
+-- KEYWORD_DAILY_TOP_100
+-- Partition : WRITE_DAY
+-- CLUSTER : KEYWORD
+[
+  {
+    "description": "The wrote day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Keyword",
+    "mode": "REQUIRED",
+    "name": "KEYWORD",
+    "type": "STRING"
+  },
+  {
+    "description": "The wrote day",
+    "mode": "REQUIRED",
+    "name": "CNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The ranking of keyword",
+    "mode": "REQUIRED",
+    "name": "RANK",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The sequence of keyword",
+    "mode": "REQUIRED",
+    "name": "ROW_NUM",
+    "type": "INTEGER"
+  }
+]
+
+INSERT INTO `kb-daas-dev.mart_200729.keyword_daily_top_100` (
+  WRITE_DAY, CHANNEL, TYPE, KEYWORD, CNT, RANK, ROW_NUM
+)
+SELECT
+  WRITE_DAY
+  , CHANNEL
+  , TYPE
+  , KEYWORD
+  , CNT
+  , RANK
+  , ROW_NUM
+FROM (
+  SELECT
+    RANK() OVER (PARTITION BY WRITE_DAY, TYPE, CHANNEL ORDER BY CNT DESC) AS rank
+    , ROW_NUMBER() OVER (PARTITION BY WRITE_DAY, TYPE, CHANNEL ORDER BY CNT DESC) AS row_num
+    , WRITE_DAY
+    , CHANNEL
+    , TYPE
+    , KEYWORD
+    , CNT
+  FROM (
+    SELECT
+      WRITE_DAY
+      , CHANNEL
+      , TYPE
+      , KEYWORD
+      , SUM(CNT) AS CNT
+    FROM
+      `kb-daas-dev.mart_200729.keyword`
+    WHERE
+      WRITE_DAY BETWEEN 20200601 AND 20200630
+    GROUP BY
+      WRITE_DAY
+      , CHANNEL
+      , TYPE
+      , KEYWORD
+  )
+)
+WHERE
+  ROW_NUM <= 100
+  
+
+-- KEYWORD_LIST
+-- PARTITION : WRITE_DAY
+-- CLUSTER : KEYWORD
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "ID",
+    "mode": "NULLABLE",
+    "name": "ID",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document ID",
+    "mode": "REQUIRED",
+    "name": "DOCID",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "SB Name",
+    "mode": "NULLABLE",
+    "name": "SB_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword",
+    "mode": "REQUIRED",
+    "name": "KEYWORD",
+    "type": "STRING"
+  },
+  {
+    "description": "The Score of Keyword",
+    "mode": "REQUIRED",
+    "name": "SCORE",
+    "type": "FLOAT"
+  }
+]
+
+
+# for bank
+INSERT INTO `kb-daas-dev.mart_200729.keyword_list` (
+    TYPE, ID, DOCID, CHANNEL, S_NAME, SB_NAME, WRITE_DAY, KEYWORD, SCORE
+) 
+SELECT
+  1 AS type
+  , NULL AS id
+  , A.DOCID AS docid
+  , A.CHANNEL AS channel
+  , A.S_NAME AS s_name
+  , A.SB_NAME AS sb_name
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , K.keyword AS keyword
+  , K.score AS score
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul') 
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+
+
+# for corona
+INSERT INTO `kb-daas-dev.mart_200729.keyword_list` (
+    TYPE, ID, DOCID, CHANNEL, S_NAME, SB_NAME, WRITE_DAY, KEYWORD, SCORE
+) 
+SELECT
+  2 AS type
+  , NULL AS id
+  , A.DOCID AS docid
+  , A.CHANNEL AS channel
+  , A.S_NAME AS s_name
+  , A.SB_NAME AS sb_name
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , K.keyword AS keyword
+  , K.score AS score
+FROM
+  `kb-daas-dev.master_200729.keyword_corona_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+
+
+-- sentence
+-- PARTITION : WRITE_DAY
+-- CLUSTER : DOCID
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "ID",
+    "mode": "NULLABLE",
+    "name": "ID",
+    "type": "INTEGER"
+  },
+{
+    "description": "Document ID",
+    "mode": "REQUIRED",
+    "name": "DOCID",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "SB Name",
+    "mode": "NULLABLE",
+    "name": "SB_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "The Written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The category of document",
+    "mode": "NULLABLE",
+    "name": "CATEGORY",
+    "type": "STRING"
+  },
+  {
+    "description": "1'st Main Setence",
+    "mode": "NULLABLE",
+    "name": "SENTENCE1",
+    "type": "STRING"
+  },
+  {
+    "description": "2'nd Main Setence",
+    "mode": "NULLABLE",
+    "name": "SENTENCE2",
+    "type": "STRING"
+  },
+  {
+    "description": "3'rd Main Setence",
+    "mode": "NULLABLE",
+    "name": "SENTENCE3",
+    "type": "STRING"
+  }
+]
+
+
+# for bank keyword
+INSERT INTO `kb-daas-dev.mart_200729.sentence` (
+  TYPE, ID, DOCID, CHANNEL, S_NAME, SB_NAME, WRITE_DAY, CATEGORY, SENTENCE1, SENTENCE2, SENTENCE3
+) 
+SELECT
+  1 AS type
+  , NULL AS ID
+  , A.DOCID AS DOCID
+  , A.CHANNEL AS CHANNEL
+  , A.S_NAME AS S_NAME
+  , A.SB_NAME AS SB_NAME
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , (CASE 
+      WHEN ARRAY_LENGTH(D2C) > 0 THEN D2C[SAFE_OFFSET(0)].label
+      ELSE NULL
+    END) AS CATEGORY
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 0 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(0)].idx)]
+      ELSE NULL
+    END) AS SENTENCE1
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 1 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(1)].idx)]
+      ELSE NULL
+    END) AS SENTENCE2
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 2 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(2)].idx)]
+      ELSE NULL
+    END) AS SENTENCE3
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  --AND A.CRAWLSTAMP < TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP, 'Asia/Seoul') BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
+
+
+# for corona keyword
+INSERT INTO `kb-daas-dev.mart_200729.sentence` (
+  TYPE, ID, DOCID, CHANNEL, S_NAME, SB_NAME, WRITE_DAY, CATEGORY, SENTENCE1, SENTENCE2, SENTENCE3
+) 
+SELECT
+  2 AS type
+  , NULL AS ID
+  , A.DOCID AS DOCID
+  , A.CHANNEL AS CHANNEL
+  , A.S_NAME AS S_NAME
+  , A.SB_NAME AS SB_NAME
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , (CASE 
+      WHEN ARRAY_LENGTH(D2C) > 0 THEN D2C[SAFE_OFFSET(0)].label
+      ELSE NULL
+    END) AS CATEGORY
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 0 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(0)].idx)]
+      ELSE NULL
+    END) AS SENTENCE1
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 1 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(1)].idx)]
+      ELSE NULL
+    END) AS SENTENCE2
+  , (CASE
+      WHEN ARRAY_LENGTH(KSE) > 2 THEN SS[SAFE_OFFSET(KSE[SAFE_OFFSET(2)].idx)]
+      ELSE NULL
+    END) AS SENTENCE3
+FROM
+  `kb-daas-dev.master_200729.keyword_corona_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  --AND A.CRAWLSTAMP < TIMESTAMP('2020-06-02 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP, 'Asia/Seoul') BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
+
+
+
+-- AGGREGATION_DAILY
+-- Partition : WRITE_DAY
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_KEYWORD",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Unique Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_UNIQUE_KEYWORD",
+    "type": "INTEGER"
+  }
+]
+
+INSERT INTO `kb-daas-dev.mart_200729.aggregation_daily` (
+  TYPE, CHANNEL, S_NAME, WRITE_DAY, CNT_DOC, CNT_RESULT_DOC, CNT_RESULT_KEYWORD, CNT_RESULT_UNIQUE_KEYWORD
+) 
+
+SELECT
+  1 as type
+  , A.channel
+  , A.s_name
+  , A.day
+  , B.doc_cnt
+  , A.cnt_result_doc
+  , A.cnt_result_keyword
+  , A.cnt_result_unique_keyword
+FROM (
+SELECT
+  A.CHANNEL AS CHANNEL
+  , A.S_NAME AS S_NAME
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , count(distinct DOCID) as CNT_RESULT_DOC
+  , count(K.keyword) as CNT_RESULT_KEYWORD
+  , count(distinct K.keyword) as CNT_RESULT_UNIQUE_KEYWORD
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
+GROUP BY
+  channel, s_name, day
+) A, (
+SELECT 
+   count(*) as doc_cnt
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , channel
+  , s_name
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+GROUP BY
+  channel, s_name, day
+) B
+WHERE
+   A.day = B.day and A.channel = B.channel and A.s_name = B.s_name
+
+
+-- AGGREGATION_DAILY_2
+-- Partition : WRITE_DAY
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_KEYWORD",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Unique Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_UNIQUE_KEYWORD",
+    "type": "INTEGER"
+  }
+]
+
+
+
+INSERT INTO `kb-daas-dev.mart_200729.aggregation_daily_2` (
+  TYPE, CHANNEL, WRITE_DAY, CNT_DOC, CNT_RESULT_DOC, CNT_RESULT_KEYWORD, CNT_RESULT_UNIQUE_KEYWORD
+) 
+SELECT
+  1 as type
+  , A.channel
+  , A.day
+  , B.doc_cnt
+  , A.cnt_result_doc
+  , A.cnt_result_keyword
+  , A.CNT_RESULT_UNIQUE_KEYWORD
+FROM (
+SELECT
+  A.CHANNEL AS CHANNEL
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , count(distinct DOCID) as CNT_RESULT_DOC
+  , count(K.keyword) as CNT_RESULT_KEYWORD
+  , count(distinct K.keyword) as CNT_RESULT_UNIQUE_KEYWORD
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
+GROUP BY
+  channel, day
+) A, (
+SELECT 
+   count(*) as doc_cnt
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , channel
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+GROUP BY
+  channel, day
+) B
+WHERE
+   A.day = B.day and A.channel = B.channel
+
+
+
+-- AGGREGATION_DAILY_3
+-- Partition : WRITE_DAY
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_KEYWORD",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Unique Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_UNIQUE_KEYWORD",
+    "type": "INTEGER"
+  }
+]
+
+
+INSERT INTO `kb-daas-dev.mart_200729.aggregation_daily_3` (
+  TYPE, CHANNEL, WRITE_DAY, CNT_DOC, CNT_RESULT_DOC, CNT_RESULT_KEYWORD, CNT_RESULT_UNIQUE_KEYWORD
+) 
+SELECT
+  1 as type
+  , A.day
+  , B.doc_cnt
+  , A.cnt_result_doc
+  , A.cnt_result_keyword
+  , A.CNT_RESULT_UNIQUE_KEYWORD
+FROM (
+SELECT
+  CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , count(distinct DOCID) as CNT_RESULT_DOC
+  , count(K.keyword) as CNT_RESULT_KEYWORD
+  , count(distinct K.keyword) as CNT_RESULT_UNIQUE_KEYWORD
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
+GROUP BY
+  day
+) A, (
+SELECT 
+   count(*) as doc_cnt
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+GROUP BY
+  day
+) B
+WHERE
+   A.day = B.day 
+
+
+
+
+-- AGGREGATION_CATEGORY_DAILY_2
+-- Partition : X
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Category",
+    "mode": "REQUIRED",
+    "name": "CATEGORY",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_KEYWORD",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Unique Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_UNIQUE_KEYWORD",
+    "type": "INTEGER"
+  }
+]
+
+INSERT INTO `kb-daas-dev.mart_200729.aggregation_category_daily_2` (
+  TYPE, CHANNEL, CATEGORY, WRITE_DAY, CNT_DOC, CNT_RESULT_DOC, CNT_RESULT_KEYWORD, CNT_RESULT_UNIQUE_KEYWORD
+) 
+SELECT
+  1 as type
+  , A.channel
+  , A.category
+  , A.day
+  , B.doc_cnt
+  , A.cnt_result_doc
+  , A.cnt_result_keyword
+  , A.CNT_RESULT_UNIQUE_KEYWORD
+FROM (
+SELECT
+  A.CHANNEL AS CHANNEL
+  , A.D2C[SAFE_OFFSET(0)].label AS category
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , count(distinct DOCID) as CNT_RESULT_DOC
+  , count(K.keyword) as CNT_RESULT_KEYWORD
+  , count(distinct K.keyword) as CNT_RESULT_UNIQUE_KEYWORD
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
+GROUP BY
+  channel, category, day
+) A, (
+SELECT 
+   count(*) as doc_cnt
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , A.channel
+  , A.D2C[SAFE_OFFSET(0)].label AS category
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+GROUP BY
+  channel, category, day
+) B
+WHERE
+   A.day = B.day and A.channel = B.channel and A.category = B.category
+   
+   
+-- AGGREGATION_CATEGORY_DAILY_3
+-- Partition : X
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Category",
+    "mode": "REQUIRED",
+    "name": "CATEGORY",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_DOC",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_KEYWORD",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Unique Keyword Count",
+    "mode": "REQUIRED",
+    "name": "CNT_RESULT_UNIQUE_KEYWORD",
+    "type": "INTEGER"
+  }
+]
+
+
+INSERT INTO `kb-daas-dev.mart_200729.aggregation_category_daily_3` (
+  TYPE, CATEGORY, WRITE_DAY, CNT_DOC, CNT_RESULT_DOC, CNT_RESULT_KEYWORD, CNT_RESULT_UNIQUE_KEYWORD
+) 
+SELECT
+  1 as type
+  , A.category
+  , A.day
+  , B.doc_cnt
+  , A.cnt_result_doc
+  , A.cnt_result_keyword
+  , A.CNT_RESULT_UNIQUE_KEYWORD
+FROM (
+SELECT
+  A.D2C[SAFE_OFFSET(0)].label AS category
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , count(distinct DOCID) as CNT_RESULT_DOC
+  , count(K.keyword) as CNT_RESULT_KEYWORD
+  , count(distinct K.keyword) as CNT_RESULT_UNIQUE_KEYWORD
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+CROSS JOIN
+  UNNEST(KPE) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+  AND A.RESPONSE.status_code = 200
+GROUP BY
+  category, day
+) A, (
+SELECT 
+   count(*) as doc_cnt
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , A.D2C[SAFE_OFFSET(0)].label AS category
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_result` A
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-31' AND '2020-06-30'
+GROUP BY
+  category, day
+) B
+WHERE
+   A.day = B.day and A.category = B.category
+
+
+-- KEYWORD_NLP
+-- Partition : WRITE_DAY
+-- 
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "Keyword",
+    "mode": "REQUIRED",
+    "name": "KEYWORD",
+    "type": "STRING"
+  },
+  {
+    "description": "The written day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Count",
+    "mode": "REQUIRED",
+    "name": "CNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Sum of score",
+    "mode": "REQUIRED",
+    "name": "SUM_SCORE",
+    "type": "FLOAT"
+  },
+  {
+    "description": "Document Count",
+    "mode": "REQUIRED",
+    "name": "CNT_DOC",
+    "type": "INTEGER"
+  }
+]
+
+
+INSERT INTO `kb-daas-dev.mart_200729.keyword_nlp` (
+    TYPE, CHANNEL, S_NAME, KEYWORD, WRITE_DAY, CNT, SUM_SCORE, CNT_DOC
+) 
+SELECT
+  1 AS type
+  , A.CHANNEL AS channel
+  , A.S_NAME as s_name
+  , CAST(FORMAT_DATE('%Y%m%d', DATE(A.WRITESTAMP, 'Asia/Seoul')) as INT64) as day
+  , K.keyword as keyword
+  , count(*) as cnt
+  , sum(K.salience) as sum_score
+  , count(distinct ID) as cnt_doc
+FROM
+  `kb-daas-dev.master_200729.keyword_bank_nlp` A
+CROSS JOIN
+  UNNEST(ENTITIES) AS K
+WHERE
+  A.CRAWLSTAMP > TIMESTAMP('2020-06-01 00:00:00', 'Asia/Seoul')
+  AND DATE(A.WRITESTAMP) BETWEEN '2020-05-01' AND '2020-06-30'
+GROUP BY channel, s_name, day, keyword

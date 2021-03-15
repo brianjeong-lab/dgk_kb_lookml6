@@ -1,0 +1,44 @@
+[
+  {
+    "description": "The wrote day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Keyword",
+    "mode": "REQUIRED",
+    "name": "KEYWORD",
+    "type": "STRING"
+  },
+  {
+    "description": "The wrote day",
+    "mode": "REQUIRED",
+    "name": "CNT",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The ranking of keyword",
+    "mode": "REQUIRED",
+    "name": "RANK",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The sequence of keyword",
+    "mode": "REQUIRED",
+    "name": "ROW_NUM",
+    "type": "INTEGER"
+  }
+]

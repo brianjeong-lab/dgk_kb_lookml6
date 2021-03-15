@@ -1,0 +1,1 @@
+ID:integer,DOCID:integer,CHANNEL:string,S_SEQ:integer,S_NAME:string,SB_NAME:string,D_CRAWLSTAMP:timestamp,D_TITLE:string,D_URL:string,D_CONTENT:string,D_WRITER:string,D_WRITESTAMP:timestamp,VIEW_COUNT:integer,REPLY_COUNT:integer,GOOD_COUNT:integer,BAD_COUNT:integer,JSON_DATA:string

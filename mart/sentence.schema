@@ -1,0 +1,62 @@
+[
+  {
+    "description": "Keyword Type (Bank : 1, Corona : 2)",
+    "mode": "REQUIRED",
+    "name": "TYPE",
+    "type": "INTEGER"
+  },
+  {
+    "description": "ID",
+    "mode": "REQUIRED",
+    "name": "ID",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Channel",
+    "mode": "REQUIRED",
+    "name": "CHANNEL",
+    "type": "STRING"
+  },
+  {
+    "description": "Service Name",
+    "mode": "REQUIRED",
+    "name": "S_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "SB Name",
+    "mode": "NULLABLE",
+    "name": "SB_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "The wrote day",
+    "mode": "REQUIRED",
+    "name": "WRITE_DAY",
+    "type": "INTEGER"
+  },
+  {
+    "description": "The category of document",
+    "mode": "NULLABLE",
+    "name": "CATEGORY",
+    "type": "STRING"
+  },
+  {
+    "description": "1'st Main Setence",
+    "mode": "NULLABLE",
+    "name": "SENTENCE1",
+    "type": "STRING"
+  },
+  {
+    "description": "2'nd Main Setence",
+    "mode": "NULLABLE",
+    "name": "SENTENCE2",
+    "type": "STRING"
+  },
+  {
+    "description": "3'rd Main Setence",
+    "mode": "NULLABLE",
+    "name": "SENTENCE3",
+    "type": "STRING"
+  }
+]

@@ -1,0 +1,40 @@
+INSERT INTO `kb-daas-dev.mart_200723.keyword_daily_top_100` (
+  WRITE_DAY, CHANNEL, TYPE, KEYWORD, CNT, RANK, ROW_NUM
+)
+SELECT
+  WRITE_DAY
+  , CHANNEL
+  , TYPE
+  , KEYWORD
+  , CNT
+  , RANK
+  , ROW_NUM
+FROM (
+  SELECT
+    RANK() OVER (PARTITION BY WRITE_DAY, TYPE, CHANNEL ORDER BY CNT DESC) AS rank
+    , ROW_NUMBER() OVER (PARTITION BY WRITE_DAY, TYPE, CHANNEL ORDER BY CNT DESC) AS row_num
+    , WRITE_DAY
+    , CHANNEL
+    , TYPE
+    , KEYWORD
+    , CNT
+  FROM (
+    SELECT
+      WRITE_DAY
+      , CHANNEL
+      , TYPE
+      , KEYWORD
+      , SUM(CNT) AS CNT
+    FROM
+      `kb-daas-dev.mart_200723.keyword_2_more`
+    WHERE
+      WRITE_DAY BETWEEN 20200601 AND 20200630
+    GROUP BY
+      WRITE_DAY
+      , CHANNEL
+      , TYPE
+      , KEYWORD
+  )
+)
+WHERE
+  ROW_NUM <= 100
